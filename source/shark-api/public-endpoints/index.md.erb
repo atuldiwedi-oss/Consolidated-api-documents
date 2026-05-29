@@ -1,0 +1,899 @@
+<h1 id='public-endpoints'>Public Endpoints</h1>
+<p>Public endpoints in Shark are designed to facilitate easy access to various functionalities of the Shark platform, particularly for integration with external systems and applications. 
+
+Below is an overview of the public endpoints available in Shark, their typical uses, and example API calls.</p>
+
+<h2 id='ticker-update-24hr'>Ticker Update (24Hr)</h2>
+
+`GET /v1/market/ticker24Hr`
+
+Fetches the 24-hour market ticker data for a specific trading pair. 
+
+It provides details such as the last traded price, volume, and other market metrics over the past 24 hours.
+
+
+```javascript
+async function fetchTicker() {
+    const endpoint = "/v1/market/ticker24Hr/";  // API endpoint for fetching the 24-hour market ticker
+    const contractPair = "BTCINR";              // The trading pair for which the ticker data is being requested
+    const url = `${endpoint}${contractPair}`;   // Constructs the full URL by appending the trading pair to the endpoint
+
+    // Call the getRequest function with the constructed URL
+    return await getRequest(url, {});
+}
+```
+
+```python
+import requests
+import json
+
+def get_24hr_ticker_update():
+    # Get the contract pair input from the user
+    contract_pair = input("Enter the contract pair (e.g., btc, eth): ").lower()
+
+    # Validate the input
+    if not contract_pair:
+        print("Invalid contract pair. Please enter a valid contract pair (e.g., btc, eth).")
+        return
+
+    # Construct the full URL for the API request using the provided contract pair
+    full_url = f"https://api.sharkexchange.in/v1/market/ticker24Hr/{contract_pair}"
+
+    try:
+        # Send the GET request to the API
+        response = requests.get(full_url)
+        response.raise_for_status()  # Raise an error for HTTP 4xx/5xx responses
+
+        # Parse the JSON response data
+        response_data = response.json()
+
+        # Print the 24-hour ticker update in a formatted manner
+        print('24-hour ticker update fetched successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        # Handle HTTP errors specifically
+        print(f"Error: {err.response.text if err.response else err}")
+    except Exception as e:
+        # Handle any other unexpected errors
+        print(f"An unexpected error occurred: {str(e)}")
+```
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>contractPair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch the ticker data (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response parameters are as follows:
+
+```json
+// Response
+{
+  "data": {
+    "e": "24hrTicker",
+    "E": 1726313209122,
+    "s": "BTCINR",
+    "p": "139470.66",
+    "P": "2.718",
+    "w": "5230573.12",
+    "c": "5271387.66",
+    "Q": "0.081",
+    "o": "5131917",
+    "h": "5344655.41",
+    "l": "5079790.8",
+    "v": "274282.584",
+    "q": "16265932028.08",
+    "O": 1726226760000,
+    "C": 1726313209120,
+    "F": 5380307688,
+    "L": 5383597456,
+    "n": 3289757
+  }
+}
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>e</strong></td>
+      <td>The event type (<code>24hrTicker</code>), indicating a 24-hour ticker event.</td>
+    </tr>
+    <tr>
+      <td><strong>E</strong></td>
+      <td>The event time in milliseconds since epoch (<code>1726313209122</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>s</strong></td>
+      <td>The trading pair symbol (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>p</strong></td>
+      <td>The price change in the last 24 hours (<code>139470.66 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>P</strong></td>
+      <td>The percentage price change in the last 24 hours (<code>2.718%</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>w</strong></td>
+      <td>The weighted average price in the last 24 hours (<code>5230573.12 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>c</strong></td>
+      <td>The last price (<code>5271387.66 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Q</strong></td>
+      <td>The last quantity traded (<code>0.081 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>o</strong></td>
+      <td>The open price of the 24-hour period (<code>5131917 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>h</strong></td>
+      <td>The highest price in the last 24 hours (<code>5344655.41 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>l</strong></td>
+      <td>The lowest price in the last 24 hours (<code>5079790.8 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>v</strong></td>
+      <td>The total traded volume in the last 24 hours (<code>274282.584 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>q</strong></td>
+      <td>The total traded quote asset volume in the last 24 hours (<code>16265932028.08 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>O</strong></td>
+      <td>The start time of the 24-hour period in milliseconds since epoch (<code>1726226760000</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>C</strong></td>
+      <td>The end time of the 24-hour period in milliseconds since epoch (<code>1726313209120</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>F</strong></td>
+      <td>The first trade ID in the 24-hour period (<code>5380307688</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>L</strong></td>
+      <td>The last trade ID in the 24-hour period (<code>5383597456</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>n</strong></td>
+      <td>The number of trades in the 24-hour period (<code>3289757</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id='agg-trade-update'>Aggregate Trade Update</h2>
+
+`GET /v1/market/aggTrade`
+
+Retrieves aggregated trade data for a specific trading pair. 
+
+
+Aggregated trades provide summarized information about trade activities, such as total volume and price changes, for the given trading pair.
+
+
+```javascript
+async function fetchAggTrade() {
+    const endpoint = "/v1/market/aggTrade/";   // Define the API endpoint for aggregated trades
+    const contractPair = "BTCINR";             // Specify the trading pair (e.g., Bitcoin to Indian Rupee)
+    const url = `${endpoint}${contractPair}`;  // Construct the full URL by appending the trading pair to the endpoint
+
+    // Call the getRequest function to send the GET request to the API
+    return await getRequest(url, {});
+}
+```
+
+```python
+import requests
+import json
+
+def get_trade_updates():
+    # Prompt the user to enter a contract pair
+    contract_pair = input("Enter the contract pair (e.g., btc, eth): ").lower()
+
+    # Validate the user input
+    if not contract_pair:
+        print("Invalid contract pair. Please enter a valid contract pair (e.g., btc, eth).")
+        return
+
+    # Construct the URL for the API request using the provided contract pair
+    full_url = f"https://api.sharkexchange.in/v1/market/aggTrade/{contract_pair}"
+
+    try:
+        # Send the GET request to fetch trade updates
+        response = requests.get(full_url)
+        response.raise_for_status()  # Raise an exception for HTTP error responses
+
+        # Parse the JSON response data
+        response_data = response.json()
+
+        # Print the trade updates in a formatted manner
+        print('Trade updates fetched successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        # Handle HTTP errors specifically
+        print(f"Error: {err.response.text if err.response else err}")
+    except Exception as e:
+        # Handle any other unexpected errors
+        print(f"An unexpected error occurred: {str(e)}")
+
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>contractPair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch aggregated trade data (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response body parameters are described as follows:
+
+```json
+// Response
+{
+  "data": [
+    {
+      "e": "aggTrade",
+      "E": 1726313202969,
+      "a": 2329235556,
+      "s": "BTCINR",
+      "p": "5271343.57",
+      "q": "0.002",
+      "f": 5383597285,
+      "l": 5383597285,
+      "T": 1726313202966,
+      "m": true
+    }
+  ]
+}
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>e</strong></td>
+      <td>The event type (<code>aggTrade</code>), indicating an aggregated trade event.</td>
+    </tr>
+    <tr>
+      <td><strong>E</strong></td>
+      <td>The event time in milliseconds since epoch (<code>1726313202969</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>a</strong></td>
+      <td>The aggregate trade ID (<code>2329235556</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>s</strong></td>
+      <td>The trading pair symbol (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>p</strong></td>
+      <td>The price of the trade (<code>5271343.57 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>q</strong></td>
+      <td>The quantity of the trade (<code>0.002 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>f</strong></td>
+      <td>The first trade ID in the aggregate trade (<code>5383597285</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>l</strong></td>
+      <td>The last trade ID in the aggregate trade (<code>5383597285</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>T</strong></td>
+      <td>The trade time in milliseconds since epoch (<code>1726313202966</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>m</strong></td>
+      <td>Whether the buyer is the market maker (<code>true</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id='depth-update'>Depth Update</h2>
+
+`GET /v1/market/depth/`
+
+Fetches the order book depth data for a specific trading pair. 
+
+It provides information about the current market depth, including bid and ask prices and their respective volumes, which is essential for understanding market liquidity.
+
+
+```javascript
+async function fetchDepth() {
+    const endpoint = "/v1/market/depth/";   // API endpoint for fetching order book depth data
+    const contractPair = "BTCINR";           // Trading pair for which the depth data is requested
+    const url = `${endpoint}${contractPair}`; // Constructs the full URL by appending the trading pair to the endpoint
+
+    // Call the getRequest function with the constructed URL
+    return await getRequest(url, {});
+}
+```
+```python
+def get_depth_update():
+    # Prompt the user to enter a contract pair
+    contract_pair = input("Enter the contract pair (e.g., btc, eth): ").lower()
+
+    # Validate the user input
+    if not contract_pair:
+        print("Invalid contract pair. Please enter a valid contract pair (e.g., btc, eth).")
+        return
+
+    # Construct the URL for the API request using the provided contract pair
+    full_url = f"https://api.sharkexchange.in/v1/market/depth/{contract_pair}"
+
+    try:
+        # Send the GET request to fetch depth updates
+        response = requests.get(full_url)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+
+        # Parse the JSON response data
+        response_data = response.json()
+
+        # Print the depth update in a formatted manner
+        print('Depth update fetched successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        # Handle HTTP errors specifically
+        print(f"Error: {err.response.text if err.response else err}")
+    except Exception as e:
+        # Handle any other unexpected errors
+        print(f"An unexpected error occurred: {str(e)}")
+```
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>contractPair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch the order book depth data (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The parameters contained in the response body are as follows:
+
+```json
+// Response
+{
+  "data": {
+    "e": "depthUpdate",
+    "E": 1726313210012,
+    "T": 1726313210009,
+    "s": "BTCINR",
+    "U": 5339856484581,
+    "u": 5339856497601,
+    "pu": 5339856483867,
+    "b": [
+      [
+        "5271043.69",
+        "0.554"
+      ]
+    ],
+    "a": [
+      [
+        "5271396.49",
+        "0.866"
+      ]
+    ]
+  }
+}
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>e</strong></td>
+      <td>The event type (<code>depthUpdate</code>), indicating a market depth update.</td>
+    </tr>
+    <tr>
+      <td><strong>E</strong></td>
+      <td>The event time in milliseconds since epoch (<code>1726313210012</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>T</strong></td>
+      <td>The transaction time in milliseconds since epoch (<code>1726313210009</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>s</strong></td>
+      <td>The trading pair symbol (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>U</strong></td>
+      <td>The first update ID in the update (<code>5339856484581</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>u</strong></td>
+      <td>The last update ID in the update (<code>5339856497601</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>pu</strong></td>
+      <td>The previous update ID (<code>5339856483867</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>b</strong></td>
+      <td>Current bid prices and quantities. Each entry is an array where the first element is the price and the second element is the quantity. Example: <code>[["5271043.69", "0.554"]]</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>a</strong></td>
+      <td>Current ask prices and quantities. Each entry is an array where the first element is the price and the second element is the quantity. Example: <code>[["5271396.49", "0.866"]]</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id='klines'>Get Klines</h2>
+
+`POST /v1/market/klines`
+
+Retrieves candlestick (kline) data for a specified trading pair and time interval. 
+
+It provides historical price data that can be used for charting and analysis, including start and end times, and limits on the number of records returned.
+
+```javascript
+async function getKlines() {
+    const endpoint = "/v1/market/klines?priceType=MARK_PRICE";
+
+    // Define the fixed values for positionId and amount (though not used in this function)
+    const positionId = "18c6c979-b089-4e67-b627-4c2072d0d5cb"; // Replace with your actual position ID
+    const amount = 1; // Replace with the actual amount you want to add
+
+    // Prepare request payload
+    const params = {
+        pair: "BTCINR",
+        interval: "1m",
+        // Optional
+        startTime: 1696425435000,
+        endTime: 1696425435999,
+        limit: 1000
+    };
+
+    // Call the postRequest function
+    return await postRequest(endpoint, params);
+}
+```
+
+```python
+def get_kline_data():
+  try:
+      # User inputs
+      pair = input("Enter the trading pair (e.g., BTCINR): ").upper()
+      interval = input("Enter the interval (e.g., 1m, 5m, 1h): ").lower()
+
+      # Prepare the request body (JSON)
+      params = {
+          'pair': pair,
+          'interval': interval,
+          'limit': 1000
+      }
+
+      # Headers for the POST request (no API key or signature required)
+      headers = {
+          'Content-Type': 'application/json'
+      }
+
+      # Construct the full URL for the Kline endpoint
+      kline_url = "https://api.sharkexchange.in/v1/market/klines?priceType=MARK_PRICE"
+
+      # Send the POST request to get Kline data
+      response = requests.post(kline_url, json=params, headers=headers)
+      response.raise_for_status() # Raises an error for 4xx/5xx responses
+      response_data = response.json()
+      print('Kline data fetched successfully:', json.dumps(response_data, indent=4))
+
+  except ValueError:
+      print("Please enter valid inputs for pair, interval.")
+  except requests.exceptions.HTTPError as err:
+      print(f"Error: {err.response.text if err.response else err}")
+  except Exception as e:
+      print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>priceType</td>
+            <td>PriceType</td>
+            <td>No</td>
+            <td>The candle stick price type which to fetch (MARK_PRICE or LAST_PRICE)</td>
+        </tr>
+        <tr>
+            <td>pair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch kline data (e.g., BTCINR)</td>
+        </tr>
+        <tr>
+            <td>interval</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The interval for each kline (e.g., "1m" for 1 minute, "5m" for 5 minutes)</td>
+        </tr>
+        <tr>
+            <td>startTime</td>
+            <td>number</td>
+            <td>No</td>
+            <td>The start time (in milliseconds) for the kline data (timestamp)</td>
+        </tr>
+        <tr>
+            <td>endTime</td>
+            <td>number</td>
+            <td>No</td>
+            <td>The end time (in milliseconds) for the kline data (timestamp)</td>
+        </tr>
+        <tr>
+            <td>limit</td>
+            <td>number</td>
+            <td>No</td>
+            <td>The maximum number of kline records to return</td>
+        </tr>
+    </tbody>
+</table>
+
+
+### Response
+
+The response parameters are described below:
+
+```json
+[
+  {
+    "startTime": "1726312200000",
+    "open": "5270382.19",
+    "high": "5270408.64",
+    "low": "5270382.19",
+    "close": "5270382.19",
+    "endTime": "1726312259999",
+    "volume": "59.102"
+  },
+]
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>startTime</strong></td>
+      <td>The start time of the interval in milliseconds since epoch (<code>1726312200000</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>open</strong></td>
+      <td>The opening price of the interval (<code>5270382.19 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>high</strong></td>
+      <td>The highest price during the interval (<code>5270408.64 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>low</strong></td>
+      <td>The lowest price during the interval (<code>5270382.19 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>close</strong></td>
+      <td>The closing price of the interval (<code>5270382.19 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>endTime</strong></td>
+      <td>The end time of the interval in milliseconds since epoch (<code>1726312259999</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>volume</strong></td>
+      <td>The trading volume during the interval (<code>59.102 BTC</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id='exchange'>Exchange</h2>
+
+`GET /v1/exchange/exchangeInfo`
+
+Retrieve exchange information
+
+```javascript
+async function getExchangeInfo() {
+    const endpoint = "/v1/exchange/exchangeInfo";
+
+    // Prepare request payload
+    const params = {
+        // Optional
+        market:"INR"
+    };
+
+    // Call the postRequest function
+    return await getRequest(endpoint, params);
+}
+```
+
+```python
+
+def get_exchange_info():
+
+  # Construct the URL
+  full_url = f"{base_url}/v1/exchange/exchangeInfo"
+
+  try:
+      # Send the GET request to fetch exchange information
+      response = requests.get(full_url)
+      response.raise_for_status()  # Raises an error for 4xx/5xx responses
+      response_data = response.json()
+      print('Exchange information fetched successfully:', json.dumps(response_data, indent=4))
+  except requests.exceptions.HTTPError as err:
+      print(f"Error: {err.response.text if err.response else err}")
+  except Exception as e:
+      print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>market</td>
+            <td>string</td>
+            <td>No</td>
+            <td>Will return exchangeInfo for market (e.g., INR/USDT)</td>
+        </tr>
+    </tbody>
+</table>
+
+
+### Response
+
+The response parameters are described below:
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>market</td>
+<td>A list of markets included in the response.</td>
+</tr>
+<tr>
+<td>contracts</td>
+<td>An array of contract objects that contain detailed information about specific trading contracts.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>The name of the trading pair (e.g., &quot;BTCINR&quot; for Bitcoin to INR)</td>
+</tr>
+<tr>
+<td>contractName</td>
+<td>The full name of the contract (e.g., &quot;Bitcoin&quot;).</td>
+</tr>
+<tr>
+<td>filters</td>
+<td>A list of filters that apply to the contract, detailing quantity and order constraints</td>
+</tr>
+<tr>
+<td>maxQty</td>
+<td>The maximum quantity allowed</td>
+</tr>
+<tr>
+<td>minQty</td>
+<td>The minimum quantity allowed</td>
+</tr>
+<tr>
+<td>filterType</td>
+<td>The type of filter (e.g., &quot;MARKET_QTY_SIZE&quot;, &quot;LIMIT_QTY_SIZE&quot;, &quot;MAX_NUM_ORDERS&quot;, &quot;MIN_NOTIONAL&quot;).</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>The maximum number of orders allowed.</td>
+</tr>
+<tr>
+<td>notional</td>
+<td>The minimum notional value.</td>
+</tr>
+<tr>
+<td>makerFee</td>
+<td>The fee percentage for makers.</td>
+</tr>
+<tr>
+<td>takerFee</td>
+<td>The fee percentage for takers.</td>
+</tr>
+<tr>
+<td>baseAsset</td>
+<td>The base asset for the contract (e.g., &quot;BTC&quot;).</td>
+</tr>
+<tr>
+<td>orderTypes</td>
+<td>The types of orders supported (e.g., &quot;LIMIT&quot;, &quot;MARKET&quot;).</td>
+</tr>
+<tr>
+<td>quoteAsset</td>
+<td>The quote asset for the contract (e.g., &quot;INR&quot;).</td>
+</tr>
+<tr>
+<td>maxLeverage</td>
+<td>The maximum leverage allowed (e.g., &quot;20&quot;).</td>
+</tr>
+<tr>
+<td>contractType</td>
+<td>The type of contract (e.g., &quot;PERPETUAL&quot;).</td>
+</tr>
+<tr>
+<td>marginBuffer</td>
+<td>The margin buffer value.</td>
+</tr>
+<tr>
+<td>depthGrouping</td>
+<td>The grouping for order book depth (e.g., [&quot;0.1&quot;]).</td>
+</tr>
+<tr>
+<td>liquidationFee</td>
+<td>The fee percentage for liquidation (e.g., &quot;0.020000&quot;).</td>
+</tr>
+<tr>
+<td>pricePrecision</td>
+<td>The number of decimal places for prices.</td>
+</tr>
+<tr>
+<td>isDefaultContract</td>
+<td>A boolean indicating if this is the default contract (e.g., true).</td>
+</tr>
+<tr>
+<td>quantityPrecision</td>
+<td>The number of decimal places for quantities.</td>
+</tr>
+<tr>
+<td>limitPriceVarAllowed</td>
+<td>The allowed price variation for limit orders (e.g., &quot;0.2&quot;).</td>
+</tr>
+<tr>
+<td>marginBufferPercentage</td>
+<td>The percentage for margin buffer (e.g., &quot;1&quot;).</td>
+</tr>
+<tr>
+<td>maintenanceMarginPercentage</td>
+<td>The percentage for maintenance margin (e.g., &quot;1&quot;).</td>
+</tr>
+<tr>
+<td>iconUrl</td>
+<td>The URL for the contract&#39;s icon (e.g., &quot;string&quot;).</td>
+</tr>
+<tr>
+<td>reduceMarginAllowedRatioPercent</td>
+<td>The allowed ratio percentage for reducing margin (e.g., 0.2).</td>
+</tr>
+<tr>
+<td>market</td>
+<td>The market identifier</td>
+</tr>
+<tr>
+<td>marginAssetsSupported</td>
+<td>A list of supported margin assets (e.g., [&quot;INR&quot;]).</td>
+</tr>
+<tr>
+<td>fundingFeeInterval</td>
+<td>The interval for funding fees (e.g., 8).</td>
+</tr>
+<tr>
+<td>tags</td>
+<td>A list of tags associated with the market or contracts (e.g., [&quot;MEME&quot;, &quot;DECENTRALIZED&quot;]).</td>
+</tr>
+<tr>
+<td>assetPrecisions</td>
+<td>An object that specifies the precision for assets.</td>
+</tr>
+<tr>
+<td>INR</td>
+<td>The precision for INR (e.g., 2 decimal places).</td>
+</tr>
+<tr>
+<td>USDT</td>
+<td>The precision for USDT (e.g., 4 decimal places).</td>
+</tr>
+<tr>
+<td>conversionRates</td>
+<td>An object that specifies conversion rates for margin and settlement.</td>
+</tr>
+<tr>
+<td>INR_MARGIN_USDT</td>
+<td>The conversion rate for INR margin to USDT (e.g., 88).</td>
+</tr>
+<tr>
+<td>INR_MARGIN_INR</td>
+<td>The conversion rate for INR margin to INR (e.g., 1)</td>
+</tr>
+<td>INR_SETTLEMENT_USDT</td>
+<td>The conversion rate for INR settlement to USDT (e.g., 88).</td>
+</tr>
+<tr>
+<td>INR_SETTLEMENT_INR</td>
+<td>The conversion rate for INR settlement to INR (e.g., 1)</td>
+</tr>
+<td>USDT_SETTLEMENT_USDT</td>
+<td>The conversion rate for USDT settlement to USDT (e.g., 1).</td>
+</tr>
+<tr>
+<td>USDT_MARGIN_USDT</td>
+<td>The conversion rate for USDT margin to USDT (e.g., 1)</td>
+</tr>
+</tbody></table>
+

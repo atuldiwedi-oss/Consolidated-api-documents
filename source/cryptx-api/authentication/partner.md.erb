@@ -1,0 +1,72 @@
+<h1 id='authentication'>Authentication123</h1>
+<p>As a partner looking to integrate with Cryptx APIs and access the functionalities programmatically, ensure the following:</p>
+
+<ol>
+<li><p>Create an account on the platform and share the email with Cryptx. 
+<br/>This will be set as the master account for the partner. 
+All API requests from partners will be authenticated using the tokens of this master account only.</p></li>
+<li><p>Share the RSA-generated public key with Cryptx. 
+<br/>The corresponding private key should be used for generating header signature.</p>
+
+<p>These commands can be used for generating such private-public key pair.</p>
+
+<p><code class="pre">
+ openssl genrsa 2048 -out private.pem <br/>
+ openssl rsa -in private.pem -pubout -outform PEM -out public.pem
+</code></p></li>
+<li><p>All requests should contain cookie which will be shared by Cryptx.</p></li>
+<li><p>All requests should contain these common headers.</p></li>
+</ol>
+
+<blockquote>
+<p>Common headers</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+
+    "timestamp": &lt;unix_timestamp_in_milliseconds&gt;,
+    "partner-name": &lt;name_of_the_partner_entity&gt;,
+    "header-sig": &lt;SHA256 header-signature&gt;
+}
+</code></pre></div><h2 id='sample-code'>Sample code</h2>
+<p>Sample code for creating SHA256 hash for header signature</p>
+
+<aside class="notice">
+The data object should contain the headers passed along with the request as defined for each endpoint.
+</aside>
+
+<blockquote>
+<p>Sample Code</p>
+</blockquote>
+<div class="highlight"><pre class="highlight javascript"><code>
+<span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">crypto</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">crypto</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">fnc</span> <span class="o">=</span> <span class="k">async</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="dl">'</span><span class="s1">timestamp</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1706178137291</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">partner-name</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">partner name</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">user-id</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">11</span><span class="dl">'</span><span class="p">,</span>
+    <span class="dl">'</span><span class="s1">account-id</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">11</span><span class="dl">'</span><span class="p">,</span>
+  <span class="p">};</span>
+
+
+  <span class="kd">const</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">crypto</span>
+    <span class="p">.</span><span class="nx">createSign</span><span class="p">(</span><span class="dl">'</span><span class="s1">SHA256</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">sign</span><span class="p">(</span><span class="nx">privateKey</span><span class="p">,</span> <span class="dl">'</span><span class="s1">hex</span><span class="dl">'</span><span class="p">);</span>
+
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">({</span> <span class="nx">key</span> <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="nx">fnc</span><span class="p">();</span>
+
+</code></pre></div>
+<p>All user-related endpoints should contain the following headers along with the common headers</p>
+
+<blockquote>
+<p>Additional headers</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+    "user-id": 'user-id as returned from create-user endpoint',
+    "account-id": 'account-id as returned from create-user endpoint'
+}
+</code></pre></div>

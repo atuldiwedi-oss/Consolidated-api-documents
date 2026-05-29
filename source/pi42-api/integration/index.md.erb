@@ -1,0 +1,128 @@
+<h1 id='integration'>Integration</h1><h2 id='create-user'>Create User</h2>
+<p>Create new user accounts on Pi42</p>
+
+<p><code>POST /v1/integration/create-user</code></p>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+  "refId": "string" // Unique Reference ID
+}
+</code></pre></div><h3 id='response'>Response</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "accountId": 1, // created user's account id
+  "userId": 1, // created user's user Id
+}
+</code></pre></div><h2 id='deposit-inr'>Deposit INR</h2>
+<p>Deposit INR into a user&#39;s wallet.</p>
+
+<p><code>POST /v1/integration/deposit-inr</code></p>
+<h3 id='request'>Request</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "amount": number,
+  "referenceId": "string" // Unique reference ID
+}
+</code></pre></div><h3 id='response-2'>Response</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "message": "string",
+  "orderId": "string"  // Unique Order ID
+}
+</code></pre></div><h2 id='withdraw-inr'>Withdraw INR</h2>
+<p>Withdraw INR from a user&#39;s wallet.</p>
+
+<p><code>POST /v1/integration/withdraw-inr</code></p>
+<h3 id='request-2'>Request</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "amount": number,
+  "referenceId": "string" // Unique reference ID
+}
+</code></pre></div><h3 id='response-3'>Response</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "message": "string",
+  "orderId": "string"  // Unique Order ID
+}
+</code></pre></div><h2 id='inr-deposit-and-withdraw-history'>INR Deposit and Withdraw History</h2>
+<p>Get the deposit and withdraw history for a user&#39;s wallet</p>
+
+<p><code>GET /v1/integration/deposit-withdraw-history</code></p>
+<h3 id='query-params'>Query Params</h3>
+<ul>
+<li>page: number;  // Minimum 1</li>
+<li>pageSize: number; // Minimum: 5, Maximum: 100</li>
+<li>type: PaymentType; // Optional</li>
+<li>from: string; // Optional -- Should be a date (YYYY-MM-DD) example: (2024-04-25) for April 25, 2024</li>
+<li>to: string; // Optional -- Should be a date (YYYY-MM-DD)</li>
+</ul>
+<h3 id='response-4'>Response</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "totalCount": number,
+  "data": [
+    {
+      "amount": number,
+      "referenceId": string,
+      "orderId": string,
+      "updatedAt": Date,
+      "createdAt": Date,
+      "paymentType": PaymentType,
+      "paymentStatus": PaymentStatus,
+      "fee": number,
+      "amountCredited": number,
+      "amountDebited": number,
+      "adminRemarks": string
+    }
+  ],
+  "hasMore": boolean,
+  "page": number,
+}
+</code></pre></div><h2 id='event-replay'>Event Replay</h2>
+<p>Event Replay between two event times.</p>
+
+<p><code>POST /v1/integration/event-replay</code></p>
+
+<p>eventTypes can be <code>orderFilled</code>, <code>orderPartiallyFilled</code>, <code>orderCancelled</code>, <code>orderFailed</code>, <code>fundingFee</code>, <code>newOrder</code>, <code>newPosition</code>, <code>updatePosition</code>, <code>closePosition</code>, <code>marginCallAlert</code>, 
+<code>liquidationAlert</code>, <code>newTrade</code></p>
+<h3 id='request-3'>Request</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  startTime: string; // in nanoseconds (ex: 1696425435000000000)
+  endTime: string; // in nanoseconds (ex: 1696425435000000000)
+  accountId: number; // optional
+  symbol: string; // optional
+  eventTypes: EventTypeFawss[]; // optional
+}
+</code></pre></div><h3 id='response-5'>Response</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  message: `Event replay acknowledged.`
+}
+</code></pre></div><h2 id='fiat-order-details'>Fiat Order Details</h2>
+<p>Get the fiat order details using reference id.</p>
+
+<p><code>GET /v1/integration/fiat-order-details</code></p>
+<h3 id='query-params-2'>Query Params</h3>
+<ul>
+<li><code>referenceId</code>: string</li>
+</ul>
+<h3 id='response-6'>Response</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "partnerName": "string",
+  "userId": number,
+  "accountId": number,
+  "paymentType": PaymentType,
+  "paymentStatus": PaymentStatus,
+  "amount": number,
+  "fee": number,
+  "amountCredited": number,
+  "amountDebited": number,
+  "referenceId": "string",
+  "orderId": "string",
+  "adminRemarks": "string", // Optional
+  "createdAt": Date,
+  "updatedAt": Date
+}
+</code></pre></div><h2 id='user-details'>User Details</h2>
+<p>Get the user id and account id of a user using reference id</p>
+
+<p><code>GET /v1/integration/user</code></p>
+<h3 id='query-params-3'>Query Params</h3><div class="highlight"><pre class="highlight plaintext"><code> refId: string
+</code></pre></div><h3 id='response-7'>Response</h3><div class="highlight"><pre class="highlight plaintext"><code>{
+  "userId": number,
+  "accountId": number
+}
+</code></pre></div><h2 id='user-tier-information'>User Tier Information</h2>
+<p><code>GET /v1/user/tier-info</code></p>
+<h3 id='response-8'>Response</h3><div class="highlight"><pre class="highlight javascript"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">userCategory</span><span class="dl">"</span><span class="p">:</span> <span class="nx">UserCategory</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">vipTier</span><span class="dl">"</span><span class="p">:</span> <span class="nx">VipTier</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">makerFeePerc</span><span class="dl">"</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="c1">//Maker Fee Percentage (Tierwise)</span>
+  <span class="dl">"</span><span class="s2">takerFeePerc</span><span class="dl">"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="c1">//Taker Fee Percentage (Tierwise)</span>
+  <span class="dl">"</span><span class="s2">referralCommissionPerc</span><span class="dl">"</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="c1">//Referral Program - Referrer Commission Percentage (Tierwise)</span>
+  <span class="dl">"</span><span class="s2">feeDiscountPerc</span><span class="dl">"</span><span class="p">:</span> <span class="mi">10</span> <span class="c1">//Referral Program - Referee's Discount Percentage on trading Fee (Tierwise)</span>
+<span class="p">}</span>
+</code></pre></div>

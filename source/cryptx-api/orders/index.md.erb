@@ -1,0 +1,4474 @@
+<h1 id='orders'>Orders</h1>
+
+<h3 id="place-order">Place an Order </h3>
+
+```python
+def generate_signature(api_secret, data_to_sign):
+    return hmac.new(api_secret.encode('utf-8'), data_to_sign.encode('utf-8'), hashlib.sha256).hexdigest()
+```
+
+`POST /v1/order/place-order`
+
+Place an order (either a market order or a limit order) on Cryptx's trading platform. It allows users to submit an order to buy or sell a specific asset.
+<aside class="notice"> Note:
+<ul>
+<li>Price is compulsory to place a limit order.</li>
+<li>To successfully place an order from a position, you need to pass the <code>placeType</code> as <code>POSITION</code> and <code>positionId</code> in the request payload, which can be obtained calling the
+<a href="#get-positions">Get Positions API</a></li>
+</ul>
+</aside>
+
+
+```javascript
+async function placeOrder(orderType, quantity = 38, price = null) {
+  // Validate orderType
+  if (!["MARKET", "LIMIT", "STOP_MARKET", "STOP_LIMIT"].includes(orderType)) {
+    throw new Error("Invalid order type. Must be MARKET, LIMIT, STOP_MARKET or STOP_LIMIT.");
+  }
+
+  // Validate quantity
+  if (quantity <= 0) {
+    throw new Error("Quantity must be greater than 0.");
+  }
+
+  const params = {
+    placeType: "ORDER_FORM",
+    quantity: quantity, // Dynamically set quantity
+    side: "BUY",
+    symbol: "GRTINR",
+    reduceOnly: false,
+    marginAsset: "INR",
+    type: orderType, // Set the order type dynamically
+  };
+
+  // Add additional parameters if the order is a LIMIT order
+  if (orderType === "LIMIT") {
+    if (price === null || price <= 0) {
+      throw new Error("Price must be specified and greater than 0 for LIMIT orders.");
+    }
+    params.price = price; // Dynamically set price for LIMIT orders
+  }
+
+  const endpoint = "/v1/order/place-order";
+
+  try {
+    // Call the postRequest function
+    const response = await postRequest(endpoint, params);
+    return response;
+  } catch (error) {
+    console.error("Failed to place order:", error);
+    throw error;
+  }
+}
+
+// Example usage for market order
+placeOrder("MARKET");
+
+// Example usage for limit order with price
+placeOrder("LIMIT", 38, 11.9);
+```
+
+```python
+def place_order():
+    # Generate the current timestamp in milliseconds
+    timestamp = str(int(time.time() * 1000))
+
+    # Define the order parameters
+    params = {
+        'timestamp': timestamp,        # Current timestamp in milliseconds
+        'placeType': 'ORDER_FORM',     # Type of order placement, e.g., 'ORDER_FORM'
+        'quantity': 0.002,             # Quantity of the asset to trade
+        'side': 'BUY',                 # Order side, either 'BUY' or 'SELL'
+        'symbol': 'BTCUSDT',           # Trading pair, e.g., Bitcoin to USDT
+        'type': 'MARKET',              # Order type, either 'MARKET' or 'LIMIT'
+        'reduceOnly': False,           # Whether to reduce an existing position only
+        'marginAsset': 'INR',          # The asset used as margin (INR in this case)
+        'deviceType': 'WEB',           # Device type (e.g., WEB, MOBILE)
+        'userCategory': 'EXTERNAL',    # User category (e.g., EXTERNAL, INTERNAL)
+        'price': 50000,                # Price for the limit order (included here but irrelevant for market orders)
+    }
+
+    # Convert the parameters to a JSON string to sign
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+
+    # Generate the signature for authentication
+    signature = generate_signature(api_secret, data_to_sign)
+
+    # Define the headers including the API key and the signature
+    headers = {
+        'api-key': api_key,
+        'signature': signature,
+    }
+
+    try:
+        # Send the POST request to place the order
+        response = requests.post(f'{base_url}/v1/order/place-order', json=params, headers=headers)
+
+        # Raise an HTTPError if the response status is 4xx or 5xx
+        response.raise_for_status()
+
+        # Parse the JSON response data
+        response_data = response.json()
+
+        # Print the success message with the order details
+        print('Order placed successfully:', json.dumps(response_data, indent=4))
+
+    except requests.exceptions.HTTPError as err:
+        # Handle HTTP errors specifically
+        print(f"Error: {err.response.text if err.response else err}")
+
+    except Exception as e:
+        # Handle any other unexpected errors
+        print(f"An unexpected error occurred: {str(e)}")
+```
+<table style="border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>quantity</td>
+      <td>number</td>
+      <td>No</td>
+      <td>The amount of the asset to be ordered. Specify the desired quantity.</td>
+    </tr>
+    <tr>
+      <td>price</td>
+      <td>number</td>
+      <td>Conditional</td>
+      <td>The price at which to place the LIMIT/STOP_LIMIT order. Must be specified if orderType is "LIMIT" or "STOP_LIMIT".</td>
+    </tr>
+    <tr>
+      <td>placeType</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>Can be either "ORDER_FORM" or "POSITION". Indicates the type of order placement.</td>
+    </tr>
+    <tr>
+      <td>side</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The side of the order, which is "BUY" in this case.</td>
+    </tr>
+    <tr>
+      <td>symbol</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The trading pair symbol, for example, "GRTINR".</td>
+    </tr>
+    <tr>
+      <td>reduceOnly</td>
+      <td>boolean</td>
+      <td>Yes</td>
+      <td>Indicates whether the order should only reduce the position. Default is false.</td>
+    </tr>
+    <tr>
+      <td>marginAsset</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The asset used for margin, such as "INR".</td>
+    </tr>
+    <tr>
+    <tr>
+      <td>orderType</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The type of the order. It can be MARKET, LIMIT, STOP_MARKET or STOP_LIMIT.</td>
+    </tr>
+    </tr>
+        <tr>
+      <td>takeProfitPrice</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Price at which take profit order should be executed.</td>
+    </tr>
+        <tr>
+      <td>stopLossPrice</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Price at which stop loss order should be executed.</td>
+    </tr>
+    <tr>
+      <td>stopPrice</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Compulsory for STOP_MARKET and STOP_LIMIT orders</td>
+    </tr>
+  </tbody>
+</table>
+
+
+### Response
+
+The response parameters are described below:
+
+```json
+# Response
+{
+    "clientOrderId": "19db8caf3cd3e5a08cfa-6895-ext",
+    "time": "2024-09-13T08:19:18.029Z",
+    "symbol": "BTCUSDT",
+    "contractType": "PERPETUAL",
+    "type": "MARKET",
+    "side": "BUY",
+    "price": 58002,
+    "orderAmount": 0.003,
+    "filledAmount": 0,
+    "availableBalance": 8564.64,
+    "linkId": "19db8caf3cd3e5a08cfa-6895-ext",
+    "linkType": "ORDER",
+    "subType": "PRIMARY",
+    "placeType": "ORDER_FORM",
+    "lockedMargin": 19.5274,
+    "baseAsset": "BTC",
+    "quoteAsset": "USDT",
+    "marginAsset": "INR",
+    "lockedMarginInMarginAsset": 1698.88
+    "leverage": 10
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Unique identifier for the client order (<code>19db8caf3cd3e5a08cfa-6895-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>time</strong></td>
+      <td>Timestamp when the order was placed (<code>2024-09-13T08:19:18.029Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>The trading pair for the order (<code>BTCUSDT</code>), indicating Bitcoin (BTC) traded against USDT (Tether).</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>The type of contract for the order (<code>PERPETUAL</code>), indicating a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>The type of order (<code>MARKET</code>), indicating a market order.</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>The side of the order (<code>BUY</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>The price at which the order is to be executed (<code>58002 USDT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>orderAmount</strong></td>
+      <td>The amount of the order (<code>0.003 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>filledAmount</strong></td>
+      <td>The amount of the order that has been filled (<code>0</code>, indicating no amount has been filled yet).</td>
+    </tr>
+    <tr>
+      <td><strong>availableBalance</strong></td>
+      <td>The available balance for the order (<code>8564.64 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>linkId</strong></td>
+      <td>Link identifier associated with the order (<code>19db8caf3cd3e5a08cfa-6895-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>linkType</strong></td>
+      <td>The type of link for the order (<code>ORDER</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>subType</strong></td>
+      <td>Subtype of the order (<code>PRIMARY</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>placeType</strong></td>
+      <td>The method used to place the order (<code>ORDER_FORM</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMargin</strong></td>
+      <td>The amount of margin locked for the order (<code>19.5274 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The base asset being traded (<code>BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (<code>USDT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>The asset used for margin (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMarginInMarginAsset</strong></td>
+      <td>The amount of margin locked in the margin asset (<code>1698.88 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>Leverage set for contract pair.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+
+<h2 id="edit-order">Edit an Order </h2>
+
+`PATCH /v1/order/edit-order`
+
+Edit a LIMIT or STOP order.
+<aside class="notice"> Note:
+<ul>
+<li>When the new quantity, price or stopPrice does not satisfy validations, or there is not enough available balance for editing order, the edit request will be rejected and the order will stay as it is.
+</li>
+</ul>
+</aside>
+
+
+```javascript
+async function editOrder() {
+  const endpoint = '/v1/order/edit-order';
+  const params = {
+    clientOrderId: '3er5a07975b9851cd592-0000-int', // The clientOrderId of the order to be edited
+    quantity: 0.002, // New quantity for the order (optional)
+    stopPrice: 58000, // New stop price for the order (optional)
+    price: 58002, // New price for the order (optional)
+  };
+
+  try {
+    const response = await patchRequest(endpoint, params);
+    return response;
+  } catch (error) {
+    console.error('Failed to edit order:', error);
+    throw error;
+  }
+}
+```
+
+```python
+# Function to edit/update order
+def edit_order(client_order_id,quantity=None,stop_price=None, price=None):
+
+    # Generate the current timestamp
+    timestamp = str(int(time.time() * 1000))
+
+    # Prepare the request body (JSON)
+    params = {
+        'clientOrderId' : str(client_order_id),
+        'timestamp': timestamp
+    }
+    if(quantity) :
+      params['quantity'] = int(quantity)
+    if(stop_price) :
+      params['stopPrice'] = int(stop_price)
+    if(price) :
+      params['price'] = int(price)
+
+
+    # Convert the request body to a JSON string for signing
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+
+    # Generate the signature
+    signature = generate_signature(api_secret, data_to_sign)
+
+    # Headers for the PATCH request
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature
+    }
+
+    # Construct the full URL
+    edit_order_url = f"{base_url}/v1/order/edit-order"
+
+    try:
+        # Send the PATCH request to edit the order
+        response = requests.patch(edit_order_url, json=params, headers=headers)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+        response_data = response.json()
+        print('Order edit request sent', json.dumps(response_data, indent=4), "for:", quantity)
+    except requests.exceptions.HTTPError as err:
+        print(response)
+        # print(f"Error: {err.response.text if err.response else err}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+<table style="border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Type</th>
+      <th>Required</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>clientOrderId</td>
+      <td>string</td>
+      <td>Yes</td>
+      <td>The clientOrderId of the “LIMIT”, “STOP_LIMIT” or “STOP_MARKET” order</td>
+    </tr>
+    <tr>
+      <td>quantity</td>
+      <td>number</td>
+      <td>No</td>
+      <td>The amount of the asset to be ordered. Specify the desired quantity.</td>
+    </tr>
+    <tr>
+      <td>price</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Can only be sent if order is “LIMIT” or “STOP_LIMIT”</td>
+    </tr>
+
+      <td>stopPrice</td>
+      <td>number</td>
+      <td>No</td>
+      <td>Can only be sent if order is “STOP_LIMIT” or “STOP_MARKET”</td>
+    </tr>
+  </tbody>
+</table>
+
+
+### Response
+
+The response parameters are described below:
+
+```json
+# Response
+{
+  status: "Edit request submitted successfully",	
+  availableBalance: 700,
+  lockedMargin: 200,
+  lockedMarginInMarginAsset: 200
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>Information about the submitted request (Edit request submitted successfully).</td>
+    </tr>
+    <tr>
+      <td><strong>availableBalance</strong></td>
+      <td>Updated available balance if extra margin is locked for the edit request (700 INR).</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMargin</strong></td>
+      <td>Updated locked margin for the order if extra margin is locked for the edit request (300 INR)</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMarginInMarginAsset</strong></td>
+      <td>Updated locked margin in margin asset for the order if extra margin is locked for the edit request. (300 INR)</td>
+    </tr>
+
+  </tbody>
+</table>
+
+
+<h2 id="split-tp-sl"> Split TP and SL </h2>
+
+`POST /v2/order/split-tp-sl`
+
+Add split TP/SL to a specific position. It requires a unique position ID, along with the quantity and price for TP and SL respectively. This operation enables dividing take-profit and stop-loss levels across multiple targets, helping optimize risk management and profit-taking for the position.
+
+
+```javascript
+async function split_tp_sl() {
+    // Define the API endpoint for adding margin
+    const endpoint = "/v2/order/split-tp-sl";
+
+    // Define the fixed values for positionId and amount
+    const positionId = "18c6c979-b089-4e67-b627-4c2072d0d5cb";  // Unique identifier for the position
+    const tp_quantity = 0.01;  // Quantity of TP
+    const tp_price = 95000 // Price of TP
+    const sl_quantity = 0.01;  // Quantity of SL
+    const sl_price = 85000 // Price of SL   
+
+    // Prepare request payload
+    const params = {
+        positionId: positionId,  // ID of the position to which margin is being added
+        splitTakeProfitOrders: [{ // Take Profit quantity and price
+          quantity: tp_quantity,
+          price : tp_price
+        }],
+        splitStopLossOrders: [{ // Stop Loss quantity and price
+          quantity: sl_quantity,
+          price : sl_price
+        }],
+        
+    };
+
+    // Call the postRequest function to send the POST request to the API
+    return await postRequest(endpoint, params);
+}
+```
+
+```python
+def split_tp_sl():
+    position_id = input("Enter the positionId: ")
+    tp_quantity_input = input("Enter the TP quantity: ")
+    tp_price_input = input("Enter the TP price: ")
+    sl_quantity_input = input("Enter the SL quantity: ")
+    sl_price_input = input("Enter the SL price: ")
+
+    add_margin_url = "https://api.cryptxindia.com/v2/order/split-tp-sl"
+
+    try:
+        tp_quantity = int(tp_quantity_input)
+    except ValueError:
+        tp_quantity = float(tp_quantity_input)
+
+    try:
+        tp_price = int(tp_price_input)
+    except ValueError:
+        tp_price = float(tp_price_input)
+
+    try:
+        sl_quantity = int(sl_quantity_input)
+    except ValueError:
+        tp_price = float(sl_quantity_input)
+
+    try:
+        sl_price = int(sl_price_input)
+    except ValueError:
+        sl_price = float(sl_price_input)
+
+    timestamp = str(int(time.time() * 1000))
+
+    params = {
+        'positionId': position_id,
+        'splitTakeProfitOrders':[{
+          'quantity': tp_quantity,
+          'price' : tp_price
+        }],
+        splitStopLossOrders:[{
+          'quantity': sl_quantity,
+          'price' : sl_price
+        }],
+        'timestamp': timestamp
+    }
+
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+    signature = generate_signature(api_secret, data_to_sign)
+
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature,
+    }
+
+    try:
+        response = requests.post(add_margin_url, json=params, headers=headers)
+        response.raise_for_status()
+        response_data = response.json()
+        print('Margin added successfully:', json.dumps(response_data, indent=4))
+
+    except requests.exceptions.HTTPError as err:
+        print(f"Failed {response.status_code}: {response.text}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>positionId</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Unique identifier for the position to which TP/SL is being added</td>
+        </tr>
+        <tr>
+            <td>quantity</td>
+            <td>number</td>
+            <td>No</td>
+            <td>Quantity of split tp or/and split sl</td>
+        </tr>
+        <tr>
+            <td>price</td>
+            <td>number</td>
+            <td>No</td>
+            <td>Price of split tp or/and split sl</td>
+        </tr>
+    </tbody>
+</table>
+
+<aside class="notice">
+The required <code>positionId</code> can be obtained calling the <a href="#get-positions">Get Positions API</a>
+</aside>
+
+### Response
+The response parameters are described below:
+
+```json
+# Response
+{
+  totalOrderCount: 2,
+  acceptedOrderCount: 2,
+  rejectedOrderCount: 0,
+  acceptedOrders: [{
+      "clientOrderId": "9f72fddf886c37b41e96-5-ext",
+      "time": "2024-02-21T14:19:39.604Z",
+      "symbol": "BTCINR",
+      "contractType": "PERPETUAL",
+      "type": "STOP_MARKET",
+      "side": "SELL",
+      "price": 110000,
+      "orderAmount": 0.01,
+      "filledAmount": 0,
+      "linkId": "894f5694c18b1200e508-5-ext",
+      "linkType": "ORDER_TP",
+      "subType": "TAKE_PROFIT",
+      "placeType": "POSITION"
+    },
+    {
+      "clientOrderId": "c0f1a2b4d5e697887766-5-ext",
+      "time": "2024-02-21T14:19:39.604Z",
+      "symbol": "BTCINR",
+      "contractType": "PERPETUAL",
+      "type": "STOP_MARKET",
+      "side": "SELL",
+      "price": 100000,
+      "orderAmount": 0.02,
+      "filledAmount": 0,
+      "linkId": "9e3b5a7d4c6f123abcde-5-ext",
+      "linkType": "ORDER_TP",
+      "subType": "TAKE_PROFIT",
+      "placeType": "POSITION"
+    }],
+  rejectedOrders: []
+}
+```
+
+
+<h2 id="add-margin"> Add Margin </h2>
+
+`POST /v1/order/add-margin`
+
+Add margin to a specific position. It requires a unique position ID and the amount of margin to be added. This operation helps in increasing the margin available for a given position, which can be used for trading or managing positions.
+
+
+```javascript
+async function addMargin() {
+    // Define the API endpoint for adding margin
+    const endpoint = "/v1/order/add-margin";
+
+    // Define the fixed values for positionId and amount
+    const positionId = "18c6c979-b089-4e67-b627-4c2072d0d5cb";  // Unique identifier for the position
+    const amount = 1;  // The amount of margin to be added
+
+    // Prepare request payload
+    const params = {
+        positionId: positionId,  // ID of the position to which margin is being added
+        amount: amount,          // Amount of margin to add
+    };
+
+    // Call the postRequest function to send the POST request to the API
+    return await postRequest(endpoint, params);
+}
+```
+
+```python
+def add_margin():
+    position_id = input("Enter the positionId: ")
+    amount_input = input("Enter the amount: ")
+
+    add_margin_url = "https://api.cryptxindia.com/v1/order/add-margin"
+
+    try:
+        amount = int(amount_input)
+    except ValueError:
+        amount = float(amount_input)
+
+    timestamp = str(int(time.time() * 1000))
+
+    params = {
+        'positionId': position_id,
+        'amount': amount,
+        'timestamp': timestamp
+    }
+
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+    signature = generate_signature(api_secret, data_to_sign)
+
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature,
+    }
+
+    try:
+        response = requests.post(add_margin_url, json=params, headers=headers)
+        response.raise_for_status()
+        response_data = response.json()
+        print('Margin added successfully:', json.dumps(response_data, indent=4))
+
+    except requests.exceptions.HTTPError as err:
+        print(f"Failed {response.status_code}: {response.text}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>positionId</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Unique identifier for the position to which margin is being added</td>
+        </tr>
+        <tr>
+            <td>amount</td>
+            <td>number</td>
+            <td>Yes</td>
+            <td>Amount of margin to be added to the specified position</td>
+        </tr>
+    </tbody>
+</table>
+
+<aside class="notice">
+The required <code>positionId</code> can be obtained calling the <a href="#get-positions">Get Positions API</a>
+</aside>
+
+### Response
+The response parameters are described below:
+
+
+```json
+# Response
+{
+  "lockedBalance": 870,
+  "withdrawableBalance": 9393.52,
+  "asset": "INR",
+  "message": "Margin added successfully"
+}
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>lockedBalance</strong></td>
+      <td>The amount of balance that is locked and cannot be withdrawn (870 INR).</td>
+    </tr>
+    <tr>
+      <td><strong>withdrawableBalance</strong></td>
+      <td>The amount of balance available for withdrawal (9393.52 INR).</td>
+    </tr>
+    <tr>
+      <td><strong>asset</strong></td>
+      <td>The asset or currency being used (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>message</strong></td>
+      <td>A confirmation message indicating that margin was added successfully.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="reduce-margin">Reduce Margin</h2>
+
+`POST /v1/order/reduce-margin`
+
+Reduce the margin on an existing trading position.
+
+
+```javascript
+async function reduceMargin() {
+    // Define the API endpoint for reducing margin
+    const endpoint = "/v1/order/reduce-margin";
+
+    // Define the fixed values for positionId and amount
+    const positionId = "18c6c979-b089-4e67-b627-4c2072d0d5cb";  // Unique identifier for the position
+    const amount = 1;  // The amount of margin to be reduced
+
+    // Prepare request payload
+    const params = {
+        positionId: positionId,  // ID of the position from which margin is being reduced
+        amount: amount,          // Amount of margin to reduce
+    };
+
+    // Call the postRequest function to send the POST request to the API
+    return await postRequest(endpoint, params);
+}
+```
+```python
+def reduce_margin():
+    # Collect position ID and amount to reduce from user input
+    position_id = input("Enter the positionId: ")
+    amountInput = input("Enter the amount to reduce: ")
+
+    try:
+        # Convert input to integer or float as necessary
+        amount = int(amountInput)
+    except ValueError:
+        amount = float(amountInput)
+
+    # Generate current timestamp in milliseconds
+    timestamp = str(int(time.time() * 1000))
+
+    # Prepare the request payload (JSON)
+    params = {
+        'positionId': position_id,
+        'amount': amount,
+        'timestamp': timestamp
+    }
+
+    # Convert the payload to a JSON string for signature
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+
+    # Generate the signature using a helper function
+    signature = generate_signature(api_secret, data_to_sign)
+
+    # Set the headers for the POST request
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature
+    }
+
+    # Construct the full API endpoint URL
+    reduce_margin_url = f"{base_url}/v1/order/reduce-margin"
+
+    try:
+        # Send the POST request to reduce margin
+        response = requests.post(reduce_margin_url, json=params, headers=headers)
+        response.raise_for_status()  # Raises an error for HTTP responses with 4xx/5xx status codes
+        response_data = response.json()
+        print('Margin reduced successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        print(f"Error: {err.response.text if err.response else err}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>positionId</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Unique identifier for the position from which margin is being reduced</td>
+        </tr>
+        <tr>
+            <td>amount</td>
+            <td>number</td>
+            <td>Yes</td>
+            <td>Amount of margin to reduce from the specified position</td>
+        </tr>
+    </tbody>
+</table>
+
+<aside class="notice">
+The required <code>positionId</code> can be obtained calling the <a href="#get-positions">Get Positions API</a>
+</aside>
+
+### Response
+
+The JSON body returned in the response is as follows:
+
+```json
+
+# Response
+{
+    "lockedBalance": 870,
+    "withdrawableBalance": 9393.52,
+    "asset": "INR",
+    "message": "Margin reduced successfully"
+}
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>lockedBalance</strong></td>
+      <td>The amount of balance that is locked and cannot be withdrawn (870 INR).</td>
+    </tr>
+    <tr>
+      <td><strong>withdrawableBalance</strong></td>
+      <td>The amount of balance available for withdrawal (9393.52 INR).</td>
+    </tr>
+    <tr>
+      <td><strong>asset</strong></td>
+      <td>The asset or currency being used (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>message</strong></td>
+      <td>A confirmation message indicating that margin was reduced successfully.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="get-open-orders">Get Open Orders</h2>
+
+`GET /v1/order/open-orders`
+
+Retrieves the open orders for a given account. It supports filtering results based on optional parameters such as page size, sorting order, and timestamps. The symbol parameter can be used to filter the results to a specific trading pair. <br/>This endpoint is useful for fetching the current active orders and managing them accordingly.
+
+```python
+def get_open_orders():
+# Generate the current timestamp
+    timestamp = str(int(time.time() * 1000))
+
+# Prepare parameters with the current timestamp
+    params = f"timestamp={timestamp}"
+
+# Generate the signature using the current timestamp
+    signature = generate_signature(api_secret, params)
+
+# Prepare headers
+    headers = {
+    'api-key': api_key,
+    'signature': signature,
+    }
+    open_orders_url = f"{base_url}/v1/order/open-orders"
+    try:
+
+# Send GET request to fetch open orders with the timestamp parameter
+    response = requests.get(open_orders_url, headers=headers, params={'timestamp': timestamp})
+    response.raise_for_status() # Raises an error for bad HTTP responses
+    response_data = response.json()
+    print('Open orders fetched successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+    print(f"Failed {response.status_code}: {response.text}")
+    except Exception as e:
+    print(f"An unexpected error occurred: {str(e)}")
+```
+```javascript
+async function getOpenOrders() {
+const pageSize = 100;
+const sortOrder = "desc";
+const startTimestamp = "1696425435000";
+const endTimestamp = "1725451568979";
+const symbol = "BTCUSDT";
+const params = {
+ // Optional Params
+    pageSize: pageSize.toString(),
+    sortOrder: sortOrder,
+    startTimestamp: startTimestamp,
+    endTimestamp: endTimestamp,
+    symbol: symbol,
+    };
+
+const endpoint = "/v1/order/open-orders"; // Your endpoint for fetching open orders
+
+// Call the postRequest function
+return await getRequest(endpoint, params);
+}
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>pageSize</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The number of results to return per page</td>
+        </tr>
+        <tr>
+            <td>sortOrder</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The sorting order for the results (e.g., "asc" or "desc")</td>
+        </tr>
+        <tr>
+            <td>startTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The start timestamp (in milliseconds) for filtering open orders</td>
+        </tr>
+        <tr>
+            <td>endTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The end timestamp (in milliseconds) for filtering open orders</td>
+        </tr>
+        <tr>
+            <td>symbol</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The trading pair symbol to filter the orders (e.g., BTCUSDT)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response parameters are described below:
+
+
+```json
+[
+  {
+    "clientOrderId": "ccef6a84a5cf6a463353-6238-ext",
+    "time": "2024-09-13T07:57:15.305Z",
+    "symbol": "BTCINR",
+    "contractType": "PERPETUAL",
+    "type": "MARKET",
+    "side": "BUY",
+    "price": 5170418,
+    "orderAmount": 0.002,
+    "filledAmount": 0,
+    "linkId": "ccef6a84a5cf6a463353-6238-ext",
+    "linkType": "ORDER",
+    "subType": "PRIMARY",
+    "placeType": "ORDER_FORM",
+    "baseAsset": "BTC",
+    "quoteAsset": "INR",
+    "leverage": 10,
+    "lockedMargin": 1034.8
+  }
+]
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Unique identifier for the client's order (<code>ccef6a84a5cf6a463353-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>time</strong></td>
+      <td>Timestamp when the order was placed (<code>2024-09-13T07:57:15.305Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>Trading pair involved (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupees (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>Type of contract (<code>PERPETUAL</code>), suggests a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>The order type (<code>MARKET</code>), meaning the order will be executed immediately at the current market price.</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>Indicates whether the order is to buy or sell (<code>BUY</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>The price per unit of Bitcoin at the time the order was placed (<code>5170418 INR</code> per BTC).</td>
+    </tr>
+    <tr>
+      <td><strong>orderAmount</strong></td>
+      <td>The amount of Bitcoin to be purchased (<code>0.002</code> BTC).</td>
+    </tr>
+    <tr>
+      <td><strong>filledAmount</strong></td>
+      <td>Amount of the order that has been filled so far (<code>0</code>, indicating it hasn't been executed yet).</td>
+    </tr>
+    <tr>
+      <td><strong>linkId</strong></td>
+      <td>Additional reference that ties this order to a broader system or linked entities (<code>ccef6a84a5cf6a463353-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>linkType</strong></td>
+      <td>The type of link (<code>ORDER</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>subType</strong></td>
+      <td>Order classification (<code>PRIMARY</code>), indicating the main order type.</td>
+    </tr>
+    <tr>
+      <td><strong>placeType</strong></td>
+      <td>Describes where the order was placed from (<code>ORDER_FORM</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The asset being bought (Bitcoin).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>Leverage set for contract pair.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMargin</strong></td>
+      <td>Margin locked in the order.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="get-order-history">Get Order History</h2>
+
+`GET /v1/order/order-history`
+
+Provides historical order data for a given account.
+
+It supports optional filtering by page size, sorting order, and timestamps to narrow down the results. The symbol parameter allows filtering the results to a specific trading pair.
+
+This endpoint is helpful for reviewing past orders and analyzing historical trading activity.
+
+```python
+# Function to fetch and display order history
+def order_history():
+timestamp = str(int(time.time() * 1000))
+order_history_url = "https://api.cryptxindia.com/v1/order/order-history"
+params = {
+'sortOrder': 'desc',
+'pageSize': 100,
+'timestamp': timestamp
+ }
+
+query_string = f"sortOrder={params['sortOrder']}&pageSize={params['pageSize']}&timestamp=
+{params['timestamp']}"
+
+signature = generate_signature(api_secret, query_string)
+
+headers = {
+'api-key': api_key,
+'signature': signature,
+}
+
+try:
+response = requests.get(f"{order_history_url}?{query_string}", headers=headers)
+response.raise_for_status()
+response_data = response.json()
+print('Order history fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+print(f"Failed {response.status_code}: {response.text}")
+```
+```javascript
+//Get Order History
+async function getOrderHistory() {
+  const pageSize = 100;
+  const sortOrder = "desc";
+  const startTimestamp = "1696425435000";
+  const endTimestamp = "1725451568979";
+  const symbol = "BTCUSDT";
+  const params = {
+    // Optional Params
+    pageSize: pageSize.toString(),
+    sortOrder: sortOrder,
+    startTimestamp: startTimestamp,
+    endTimestamp: endTimestamp,
+    symbol: symbol,
+  };
+  const endpoint = "/v1/order/order-history"; // Your endpoint for fetching order history
+  // Call the postRequest function
+  return await getRequest(endpoint, params);
+}
+```
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>pageSize</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The number of results to return per page</td>
+        </tr>
+        <tr>
+            <td>sortOrder</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The sorting order for the results (e.g., "asc" or "desc")</td>
+        </tr>
+        <tr>
+            <td>startTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The start timestamp (in milliseconds) for filtering order history</td>
+        </tr>
+        <tr>
+            <td>endTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The end timestamp (in milliseconds) for filtering order history</td>
+        </tr>
+        <tr>
+            <td>symbol</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The trading pair symbol to filter the orders (e.g., BTCUSDT)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The details of the JSON object returned in the response body are as follows:
+
+```json
+[
+  {
+    "clientOrderId": "c707985129f41a13ab40-6238-ext",
+    "updatedAt": "2024-09-13T10:48:57.630Z",
+    "symbol": "BTCINR",
+    "type": "MARKET",
+    "isIsolated": true,
+    "side": "SELL",
+    "price": "5182995",
+    "avgPrice": "5182656",
+    "origQty": "10365.31",
+    "cumQty": "0.002",
+    "executedQty": "0.002",
+    "reduceOnly": false,
+    "status": "FILLED",
+    "leverage": 25,
+    "subType": "PRIMARY",
+    "stopPrice": null,
+    "lockedMargin": 0,
+    "lockedMarginInMarginAsset": 0,
+    "marginAsset": "INR",
+    "contractType": "PERPETUAL",
+    "iconUrl": "https://storage.googleapis.com/cryptx-dev-static/contract-icons/btc.png",
+    "quoteAsset": "INR",
+    "baseAsset": "BTC",
+    "leveragedQty": 0.002
+  }
+]
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Unique identifier for the client's order (<code>c707985129f41a13ab40-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>updatedAt</strong></td>
+      <td>The timestamp when the order was last updated (<code>2024-09-13T10:48:57.630Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>The trading pair involved (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupees (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>The order type (<code>MARKET</code>), meaning the order was executed at the current market price.</td>
+    </tr>
+    <tr>
+      <td><strong>isIsolated</strong></td>
+      <td>Indicates whether the order is isolated (<code>true</code>), meaning it's an isolated margin trade.</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>Indicates whether the order is to buy or sell (<code>SELL</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>The price per unit of Bitcoin at the time the order was placed (<code>5182995 INR</code> per BTC).</td>
+    </tr>
+    <tr>
+      <td><strong>avgPrice</strong></td>
+      <td>The average price at which the order was executed (<code>5182656 INR</code> per BTC).</td>
+    </tr>
+    <tr>
+      <td><strong>origQty</strong></td>
+      <td>The original quantity in INR before conversion to BTC (<code>10365.31</code> INR).</td>
+    </tr>
+    <tr>
+      <td><strong>cumQty</strong></td>
+      <td>The cumulative amount of Bitcoin executed so far (<code>0.002</code> BTC).</td>
+    </tr>
+    <tr>
+      <td><strong>executedQty</strong></td>
+      <td>The total executed quantity of the order (<code>0.002</code> BTC).</td>
+    </tr>
+    <tr>
+      <td><strong>reduceOnly</strong></td>
+      <td>A flag indicating if the order is only to reduce an existing position (<code>false</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>The current status of the order (<code>FILLED</code>), meaning the order is completely executed.</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>The leverage applied to the trade (<code>25x</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>subType</strong></td>
+      <td>The order classification (<code>PRIMARY</code>), indicating the main order type.</td>
+    </tr>
+    <tr>
+      <td><strong>stopPrice</strong></td>
+      <td>The stop price associated with the order (<code>null</code>), as this is not a stop order.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMargin</strong></td>
+      <td>The amount of margin locked in INR (<code>0</code> INR).</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMarginInMarginAsset</strong></td>
+      <td>The amount of margin locked in the margin asset (<code>0</code> INR).</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>The asset used for margin (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>The type of contract (<code>PERPETUAL</code>), indicating a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>iconUrl</strong></td>
+      <td>The URL of the contract icon (<a href="https://storage.googleapis.com/cryptx-dev-static/contract-icons/btc.png" target="_blank">BTC Icon</a>).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The asset being traded (Bitcoin).</td>
+    </tr>
+    <tr>
+      <td><strong>leveragedQty</strong></td>
+      <td>The quantity of Bitcoin being traded with leverage (<code>0.002</code> BTC).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="get-linked-orders">Get Linked Orders</h2>
+
+`GET /v1/order/linked-orders`
+
+Retrieves orders that are linked by a specific link ID. It is used to fetch all orders associated with a given link ID, which can help in tracking related orders or managing linked order groups.
+
+```python
+# Function to fetch linked orders based on linkId
+def linked_orders():
+link_id = input("Enter the Link Id: ")
+timestamp = str(int(time.time() * 1000))
+linked_orders_url = "https://api.cryptxindia.com/v1/order/linked-orders"
+
+url = f"{linked_orders_url}/{link_id}"
+
+params = {
+'timestamp': timestamp
+}
+query_string = f"timestamp={params['timestamp']}"
+
+signature = generate_signature(api_secret, query_string)
+
+headers = {
+'api-key': api_key,
+'signature': signature,
+'accept': '*/*'
+ }
+try:
+response = requests.get(f"{url}?{query_string}", headers=headers)
+response.raise_for_status()
+response_data = response.json()
+print('Linked orders fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+print(f"Failed {response.status_code}: {response.text}")
+```
+
+```javascript
+// Get Linked Orders
+async function linkedOrders(linkId) {
+  const linkId = "6acd808ba5957340b009-6238-ext"
+  const endpoint = `/v1/order/linked-orders/${linkId}`; // Endpoint for fetching linked orders
+
+// Call the getRequest function (similar to postRequest)
+  return await getRequest(endpoint);
+}
+
+// Fetch Margin History
+async function fetchMarginHistory() {
+ const endpoint = "/v1/order/fetch-margin-history";
+ const pageSize = 100;
+ const sortOrder = "desc";
+ const startTimestamp = "1696425435000";
+ const endTimestamp = "1725451568979";
+ const symbol = "BTCUSDT";
+
+// Prepare query parameters
+ const params = {
+
+// Optional Params
+ pageSize: pageSize.toString(),
+ sortOrder: sortOrder,
+ startTimestamp: startTimestamp,
+ endTimestamp: endTimestamp,
+ symbol: symbol,
+ };
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>linkId</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The unique identifier for the linked orders</td>
+        </tr>
+    </tbody>
+</table>
+
+<aside class="notice">
+Requires linkId that can be obtained from <a href="#place-order">Place Order API response.</a>
+</aside>
+
+### Response
+
+The details returned in the response body as are as follows:
+
+```json
+
+// Response
+[
+  {
+    "clientOrderId": "m2l-1f04cd91efa7ebe09cad-6238-ext",
+    "time": "2024-09-11T12:14:03.706Z",
+    "symbol": "BTCINR",
+    "contractType": "PERPETUAL",
+    "type": "MARKET",
+    "side": "BUY",
+    "price": 5054068,
+    "orderAmount": 0.002,
+    "filledAmount": 0,
+    "linkId": "m2l-1f04cd91efa7ebe09cad-6238-ext",
+    "subType": "PRIMARY",
+    "linkType": "ORDER_SL",
+    "takeProfitPrice": null,
+    "stopLossPrice": null,
+    "status": "NEW",
+    "placeType": "ORDER_FORM",
+    "baseAsset": "BTC",
+    "quoteAsset": "INR"
+  }
+]
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Unique identifier for the client's order (<code>m2l-1f04cd91efa7ebe09cad-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>time</strong></td>
+      <td>The timestamp when the order was created (<code>2024-09-11T12:14:03.706Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>The trading pair involved (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupees (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>The type of contract (<code>PERPETUAL</code>), indicating a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>The order type (<code>MARKET</code>), meaning the order was executed at the current market price.</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>Indicates whether the order is to buy or sell (<code>BUY</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>The price per unit of Bitcoin at the time the order was placed (<code>5054068 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>orderAmount</strong></td>
+      <td>The total amount of Bitcoin to be bought (<code>0.002 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>filledAmount</strong></td>
+      <td>The amount of Bitcoin that has been filled so far (<code>0 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>linkId</strong></td>
+      <td>Unique identifier for the linked order (<code>m2l-1f04cd91efa7ebe09cad-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>subType</strong></td>
+      <td>The order classification (<code>PRIMARY</code>), indicating the main order type.</td>
+    </tr>
+    <tr>
+      <td><strong>linkType</strong></td>
+      <td>Indicates the link type of the order (<code>ORDER_SL</code>), possibly linking to a stop-loss order.</td>
+    </tr>
+    <tr>
+      <td><strong>takeProfitPrice</strong></td>
+      <td>The take-profit price associated with the order (<code>null</code>), indicating no take-profit price set.</td>
+    </tr>
+    <tr>
+      <td><strong>stopLossPrice</strong></td>
+      <td>The stop-loss price associated with the order (<code>null</code>), indicating no stop-loss price set.</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>The current status of the order (<code>NEW</code>), meaning the order has been placed but not filled.</td>
+    </tr>
+    <tr>
+      <td><strong>placeType</strong></td>
+      <td>The method by which the order was placed (<code>ORDER_FORM</code>), likely using an order form interface.</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The base asset being traded (<code>BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (<code>INR</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="get-reference-order">Get Referenced Order</h2>
+
+`GET /v1/order/ref-id`
+
+Retrieves order details based on the reference ID.
+
+```python
+# Function to fetch order details based on reference id
+def ref_order_details():
+reference_id = input("Enter the reference Id: ")
+timestamp = str(int(time.time() * 1000))
+order_url = "https://api.cryptxindia.com/v1/order/ref-id"
+
+url = f"{order_url}/{reference_id}"
+
+params = {
+'timestamp': timestamp
+}
+query_string = f"timestamp={params['timestamp']}"
+
+signature = generate_signature(api_secret, query_string)
+
+headers = {
+'api-key': api_key,
+'signature': signature,
+'accept': '*/*'
+ }
+try:
+response = requests.get(f"{url}?{query_string}", headers=headers)
+response.raise_for_status()
+response_data = response.json()
+print('Order details fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+print(f"Failed {response.status_code}: {response.text}")
+```
+
+```javascript
+// Get Order Details
+async function orderDetails(reference_id) {
+  const endpoint = `/v1/order/ref-id?ref_id=${reference_id}`; // Endpoint for fetching order
+
+// Call the getRequest function (similar to postRequest)
+  return await getRequest(endpoint);
+}
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>refID</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Reference id of the order</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response details are as follows:
+
+```json
+// Response
+{
+  "id": number,
+  "clientOrderId": string,
+  "filledQty": number, // net filled qty
+  "executedQty": number, // last filled qty
+  "avgPrice": number, // avg price
+  "quantity": number, // leveraged qty
+  "price": number, // Order price - limit/ stop price, market price
+  "placeType": PlaceType,
+  "lockedMargin": number,
+  "lockedMarginInMarginAsset": number, // Optional
+  "side": OrderSide,
+  "leverage": number,
+  "status": OrderStatus,
+  "stopPrice": number,
+  "symbol": string,
+  "type": UserOrderType,
+  "isIsolated": boolean,
+  "linkType": OrderLinkType,
+  "linkId": string,
+  "limitPrice": number,
+  "takeProfitPrice": number,
+  "stopLossPrice": number,
+  "subType": OrderSubType,
+  "isLiquidationOrder": boolean,
+  "createdTime": Date,
+  "updatedTime": Date,
+  "contractType": string,
+  "filledValue": number,
+  "refId": string,
+  "baseAsset": string,
+  "quoteAsset": strin,
+  "marginAsset": string,
+  "marginConversionRate": number,
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>id</strong></td>
+      <td>Unique identifier for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Client-provided unique identifier for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>filledQty</strong></td>
+      <td>Total net quantity filled for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>executedQty</strong></td>
+      <td>Quantity filled in the most recent execution.</td>
+    </tr>
+    <tr>
+      <td><strong>avgPrice</strong></td>
+      <td>Average execution price of the filled quantity.</td>
+    </tr>
+    <tr>
+      <td><strong>quantity</strong></td>
+      <td>Total leveraged order quantity.</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>Order price (limit price, stop price, or market price depending on order type).</td>
+    </tr>
+    <tr>
+      <td><strong>placeType</strong></td>
+      <td>Specifies how the order was placed.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMargin</strong></td>
+      <td>Amount of margin locked for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMarginInMarginAsset</strong></td>
+      <td>Locked margin expressed in the margin asset (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>Order side indicating buy or sell.</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>Leverage applied to the order.</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>Current status of the order.</td>
+    </tr>
+    <tr>
+      <td><strong>stopPrice</strong></td>
+      <td>Trigger price for stop or stop-limit orders.</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>Trading symbol for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>Type of user order.</td>
+    </tr>
+    <tr>
+      <td><strong>isIsolated</strong></td>
+      <td>Indicates whether the order uses isolated margin.</td>
+    </tr>
+    <tr>
+      <td><strong>linkType</strong></td>
+      <td>Type of order linkage.</td>
+    </tr>
+    <tr>
+      <td><strong>linkId</strong></td>
+      <td>Identifier used to link related orders.</td>
+    </tr>
+    <tr>
+      <td><strong>limitPrice</strong></td>
+      <td>Limit price specified for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>takeProfitPrice</strong></td>
+      <td>Price at which the take-profit order is triggered.</td>
+    </tr>
+    <tr>
+      <td><strong>stopLossPrice</strong></td>
+      <td>Price at which the stop-loss order is triggered.</td>
+    </tr>
+    <tr>
+      <td><strong>subType</strong></td>
+      <td>Sub-category of the order type.</td>
+    </tr>
+    <tr>
+      <td><strong>isLiquidationOrder</strong></td>
+      <td>Indicates whether the order is a liquidation order.</td>
+    </tr>
+    <tr>
+      <td><strong>createdTime</strong></td>
+      <td>Timestamp when the order was created.</td>
+    </tr>
+    <tr>
+      <td><strong>updatedTime</strong></td>
+      <td>Timestamp when the order was last updated.</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>Type of contract associated with the order.</td>
+    </tr>
+    <tr>
+      <td><strong>filledValue</strong></td>
+      <td>Total value of the filled portion of the order.</td>
+    </tr>
+    <tr>
+      <td><strong>refId</strong></td>
+      <td>Reference ID associated with the order.</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>Base asset of the trading pair.</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>Quote asset of the trading pair.</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>Asset used for margin.</td>
+    </tr>
+    <tr>
+      <td><strong>marginConversionRate</strong></td>
+      <td>Conversion rate applied to the margin asset.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="get-order-details">Get Order details</h2>
+
+`GET /v1/order`
+
+Retrieves order details based on the client order ID.
+
+It is used to fetch detailed information for a specific order, helping with order tracking, status verification, and lifecycle management.
+
+```python
+# Function to fetch order details based on client order id
+def order_details():
+client_order_id = input("Enter the client order Id: ")
+timestamp = str(int(time.time() * 1000))
+order_url = "https://api.cryptxindia.com/v1/order"
+
+url = f"{order_url}/{client_order_id}"
+
+params = {
+'timestamp': timestamp
+}
+query_string = f"timestamp={params['timestamp']}"
+
+signature = generate_signature(api_secret, query_string)
+
+headers = {
+'api-key': api_key,
+'signature': signature,
+'accept': '*/*'
+ }
+try:
+response = requests.get(f"{url}?{query_string}", headers=headers)
+response.raise_for_status()
+response_data = response.json()
+print('Order details fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+print(f"Failed {response.status_code}: {response.text}")
+```
+
+```javascript
+// Get Order Details
+async function orderDetails(client_order_id) {
+  const endpoint = `/v1/order/${client_order_id}`; // Endpoint for fetching order
+
+// Call the getRequest function (similar to postRequest)
+  return await getRequest(endpoint);
+}
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>clientOrderID</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Client order id of the order</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response details are as follows:
+
+```json
+// Response
+{
+  "id": number,
+  "clientOrderId": string,
+  "filledQty": number, // net filled qty
+  "executedQty": number, // last filled qty
+  "avgPrice": number, // avg price
+  "quantity": number, // leveraged qty
+  "price": number, // Order price - limit/ stop price, market price
+  "placeType": PlaceType,
+  "lockedMargin": number,
+  "lockedMarginInMarginAsset": number, // Optional
+  "side": OrderSide,
+  "leverage": number,
+  "status": OrderStatus,
+  "stopPrice": number,
+  "symbol": string,
+  "type": UserOrderType,
+  "isIsolated": boolean,
+  "linkType": OrderLinkType,
+  "linkId": string,
+  "limitPrice": number,
+  "takeProfitPrice": number,
+  "stopLossPrice": number,
+  "subType": OrderSubType,
+  "isLiquidationOrder": boolean,
+  "createdTime": Date,
+  "updatedTime": Date,
+  "contractType": string,
+  "filledValue": number,
+  "refId": string, // Optional
+  "baseAsset": string,
+  "quoteAsset": strin,
+  "marginAsset": string,
+  "marginConversionRate": number,
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>id</strong></td>
+      <td>Unique identifier for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Client-provided unique identifier for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>filledQty</strong></td>
+      <td>Total net quantity filled for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>executedQty</strong></td>
+      <td>Quantity filled in the most recent execution.</td>
+    </tr>
+    <tr>
+      <td><strong>avgPrice</strong></td>
+      <td>Average execution price of the filled quantity.</td>
+    </tr>
+    <tr>
+      <td><strong>quantity</strong></td>
+      <td>Total leveraged order quantity.</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>Order price (limit price, stop price, or market price depending on order type).</td>
+    </tr>
+    <tr>
+      <td><strong>placeType</strong></td>
+      <td>Specifies how the order was placed.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMargin</strong></td>
+      <td>Amount of margin locked for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMarginInMarginAsset</strong></td>
+      <td>Locked margin expressed in the margin asset (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>Order side indicating buy or sell.</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>Leverage applied to the order.</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>Current status of the order.</td>
+    </tr>
+    <tr>
+      <td><strong>stopPrice</strong></td>
+      <td>Trigger price for stop or stop-limit orders.</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>Trading symbol for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>Type of user order.</td>
+    </tr>
+    <tr>
+      <td><strong>isIsolated</strong></td>
+      <td>Indicates whether the order uses isolated margin.</td>
+    </tr>
+    <tr>
+      <td><strong>linkType</strong></td>
+      <td>Type of order linkage.</td>
+    </tr>
+    <tr>
+      <td><strong>linkId</strong></td>
+      <td>Identifier used to link related orders.</td>
+    </tr>
+    <tr>
+      <td><strong>limitPrice</strong></td>
+      <td>Limit price specified for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>takeProfitPrice</strong></td>
+      <td>Price at which the take-profit order is triggered.</td>
+    </tr>
+    <tr>
+      <td><strong>stopLossPrice</strong></td>
+      <td>Price at which the stop-loss order is triggered.</td>
+    </tr>
+    <tr>
+      <td><strong>subType</strong></td>
+      <td>Sub-category of the order type.</td>
+    </tr>
+    <tr>
+      <td><strong>isLiquidationOrder</strong></td>
+      <td>Indicates whether the order is a liquidation order.</td>
+    </tr>
+    <tr>
+      <td><strong>createdTime</strong></td>
+      <td>Timestamp when the order was created.</td>
+    </tr>
+    <tr>
+      <td><strong>updatedTime</strong></td>
+      <td>Timestamp when the order was last updated.</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>Type of contract associated with the order.</td>
+    </tr>
+    <tr>
+      <td><strong>filledValue</strong></td>
+      <td>Total value of the filled portion of the order.</td>
+    </tr>
+    <tr>
+      <td><strong>refId</strong></td>
+      <td>Optional reference ID associated with the order.</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>Base asset of the trading pair.</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>Quote asset of the trading pair.</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>Asset used for margin.</td>
+    </tr>
+    <tr>
+      <td><strong>marginConversionRate</strong></td>
+      <td>Conversion rate applied to the margin asset.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="get-multiple-orders">Get Multiple Orders</h2>
+
+`POST /v1/order/get-multiple`
+
+Retrieves multiple orders based on client order id.
+
+It is used to fetch a list of orders in a single request, which helps with bulk order retrieval, reporting, and efficient order management.
+
+```python
+import time
+import json
+import requests
+
+def get_multiple_orders():
+    endpoint = "/v1/order/get-multiple"
+
+    # Generate the current timestamp
+    timestamp = str(int(time.time() * 1000))
+
+    # Prepare the request body (JSON)
+    params = {
+  "clientOrderIds" : ["clientOrderId1","clientOrderId2",...]
+  }
+
+    # Convert the request body to a JSON string for signing
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+
+    # Generate the signature (ensure `generate_signature` is properly defined)
+    signature = generate_signature(api_secret, data_to_sign)
+
+    # Headers for the POST request
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature
+    }
+
+    # Construct the full URL
+    get_orders_url = f"{base_url}{endpoint}"
+
+    try:
+        # Send the POST request to update the preference
+        response = requests.post(get_orders_url, json=params, headers=headers)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+        response_data = response.json()
+        print('Orders fetched successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        print(f"Error: {err.response.text if err.response else err}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+
+```javascript
+async function getMultipleOrders() {
+    const endpoint = "/v1/order/get-multiple";
+
+    // Prepare request payload
+    const params = {
+  "clientOrderIds" : ["clientOrderId1","clientOrderId2",...]
+};
+
+    // Call the postRequest function
+    return await postRequest(endpoint, params);
+}
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>clientOrderID</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Array of client order ids</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response details are as follows:
+
+```json
+// Response
+[
+  {
+  "id": number,
+  "clientOrderId": string,
+  "filledQty": number, // net filled qty
+  "executedQty": number, // last filled qty
+  "avgPrice": number, // avg price
+  "quantity": number, // leveraged qty
+  "price": number, // Order price - limit/ stop price, market price
+  "placeType": PlaceType,
+  "lockedMargin": number,
+  "lockedMarginInMarginAsset": number, // Optional
+  "side": OrderSide,
+  "leverage": number,
+  "status": OrderStatus,
+  "stopPrice": number,
+  "symbol": string,
+  "type": UserOrderType,
+  "isIsolated": boolean,
+  "linkType": OrderLinkType,
+  "linkId": string,
+  "limitPrice": number,
+  "takeProfitPrice": number,
+  "stopLossPrice": number,
+  "subType": OrderSubType,
+  "isLiquidationOrder": boolean,
+  "createdTime": Date,
+  "updatedTime": Date,
+  "contractType": string,
+  "filledValue": number,
+  "refId": string, // Optional
+  "baseAsset": string,
+  "quoteAsset": strin,
+  "marginAsset": string,
+  "marginConversionRate": number,
+},...
+]
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>id</strong></td>
+      <td>Unique identifier for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Client-provided unique identifier for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>filledQty</strong></td>
+      <td>Total net quantity filled for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>executedQty</strong></td>
+      <td>Quantity filled in the most recent execution.</td>
+    </tr>
+    <tr>
+      <td><strong>avgPrice</strong></td>
+      <td>Average execution price of the filled quantity.</td>
+    </tr>
+    <tr>
+      <td><strong>quantity</strong></td>
+      <td>Total leveraged order quantity.</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>Order price (limit price, stop price, or market price depending on order type).</td>
+    </tr>
+    <tr>
+      <td><strong>placeType</strong></td>
+      <td>Specifies how the order was placed.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMargin</strong></td>
+      <td>Amount of margin locked for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedMarginInMarginAsset</strong></td>
+      <td>Locked margin expressed in the margin asset (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>Order side indicating buy or sell.</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>Leverage applied to the order.</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>Current status of the order.</td>
+    </tr>
+    <tr>
+      <td><strong>stopPrice</strong></td>
+      <td>Trigger price for stop or stop-limit orders.</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>Trading symbol for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>Type of user order.</td>
+    </tr>
+    <tr>
+      <td><strong>isIsolated</strong></td>
+      <td>Indicates whether the order uses isolated margin.</td>
+    </tr>
+    <tr>
+      <td><strong>linkType</strong></td>
+      <td>Type of order linkage.</td>
+    </tr>
+    <tr>
+      <td><strong>linkId</strong></td>
+      <td>Identifier used to link related orders.</td>
+    </tr>
+    <tr>
+      <td><strong>limitPrice</strong></td>
+      <td>Limit price specified for the order.</td>
+    </tr>
+    <tr>
+      <td><strong>takeProfitPrice</strong></td>
+      <td>Price at which the take-profit order is triggered.</td>
+    </tr>
+    <tr>
+      <td><strong>stopLossPrice</strong></td>
+      <td>Price at which the stop-loss order is triggered.</td>
+    </tr>
+    <tr>
+      <td><strong>subType</strong></td>
+      <td>Sub-category of the order type.</td>
+    </tr>
+    <tr>
+      <td><strong>isLiquidationOrder</strong></td>
+      <td>Indicates whether the order is a liquidation order.</td>
+    </tr>
+    <tr>
+      <td><strong>createdTime</strong></td>
+      <td>Timestamp when the order was created.</td>
+    </tr>
+    <tr>
+      <td><strong>updatedTime</strong></td>
+      <td>Timestamp when the order was last updated.</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>Type of contract associated with the order.</td>
+    </tr>
+    <tr>
+      <td><strong>filledValue</strong></td>
+      <td>Total value of the filled portion of the order.</td>
+    </tr>
+    <tr>
+      <td><strong>refId</strong></td>
+      <td>Optional reference ID associated with the order.</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>Base asset of the trading pair.</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>Quote asset of the trading pair.</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>Asset used for margin.</td>
+    </tr>
+    <tr>
+      <td><strong>marginConversionRate</strong></td>
+      <td>Conversion rate applied to the margin asset.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="get-margin-history">Fetch Margin History</h2>
+
+`GET /v1/order/fetch-margin-history`
+
+Retrieves the margin history for an account.
+
+It supports optional filtering parameters like page size, sorting order, timestamps, and trading symbol.
+
+This endpoint is useful for analyzing past margin activities and historical changes in margin levels.
+
+```python
+def fetch_margin_history():
+    endpoint = "/v1/order/fetch-margin-history"
+    symbol = input("Enter the symbol (e.g., BTCUSDT): ").upper()
+
+    pageSize = 100
+    sortOrder = "desc"
+
+# Generate current timestamp for signing
+ timestamp = str(int(time.time() * 1000))
+
+# Prepare query parameters
+    params = {
+    'pageSize': str(pageSize),
+    'sortOrder': sortOrder,
+    'symbol': symbol,
+    'timestamp': timestamp
+    }
+
+# Convert params to query string
+    query_string = '&'.join([f"{key}={value}" for key, value in params.items()])
+
+# Generate signature
+    signature = generate_signature(api_secret, query_string)
+
+# Headers for the request
+    headers = {
+    'api-key': api_key,
+     'signature': signature,
+    'accept': '*/*'
+    }
+full_url = f"{base_url}{endpoint}?{query_string}"
+
+try:
+# Send the GET request to fetch margin history
+response = requests.get(full_url, headers=headers)
+response.raise_for_status() # Raises an error for 4xx/5xx responses
+response_data = response.json()
+print('Margin history fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+print(f"Error: {err.response.text if err.response else err}")
+except Exception as e:
+print(f"An unexpected error occurred: {str(e)}")
+```
+
+```javascript
+// Fetch Margin History
+async function fetchMarginHistory() {
+  const endpoint = "/v1/order/fetch-margin-history";
+
+  const pageSize = 100;
+  const sortOrder = "desc";
+  const startTimestamp = "1696425435000";
+  const endTimestamp = "1725451568979";
+  const symbol = "BTCUSDT";
+
+// Prepare query parameters
+  const params = {
+
+// Optional Params
+    pageSize: pageSize.toString(),
+    sortOrder: sortOrder,
+    startTimestamp: startTimestamp,
+    endTimestamp: endTimestamp,
+    symbol: symbol,
+  };
+
+// Call the getRequest function
+  return await getRequest(endpoint, params);
+}
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>pageSize</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The number of results to return per page</td>
+        </tr>
+        <tr>
+            <td>sortOrder</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The sorting order for the results (e.g., "asc" or "desc")</td>
+        </tr>
+        <tr>
+            <td>startTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The start timestamp (in milliseconds) for filtering margin history</td>
+        </tr>
+        <tr>
+            <td>endTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The end timestamp (in milliseconds) for filtering margin history</td>
+        </tr>
+        <tr>
+            <td>symbol</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The trading pair symbol to filter the margin history (e.g., BTCUSDT)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response details are as follows:
+
+```json
+// Response
+{
+  "data": [
+    {
+      "id": 549,
+      "amount": 0.1,
+      "refId": null,
+      "marginInMarginAsset": 8.7,
+      "marginAsset": "INR",
+      "positionId": "90483119-0c3a-4cc0-9afa-25366f907fca",
+      "operation": "REDUCE_MARGIN",
+      "createdAt": "2024-09-12T08:59:57.707Z",
+      "updatedAt": "2024-09-12T08:59:57.707Z"
+    }
+  ],
+  "totalCount": 45,
+  "nextTimestamp": "1725624883814"
+}
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>id</strong></td>
+      <td>Unique identifier for the margin operation (<code>549</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>amount</strong></td>
+      <td>The amount involved in the margin operation (<code>0.1</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>refId</strong></td>
+      <td>Reference ID associated with the operation (<code>null</code>, indicating no reference ID).</td>
+    </tr>
+    <tr>
+      <td><strong>marginInMarginAsset</strong></td>
+      <td>Margin in the margin asset (<code>8.7</code> INR).</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>The asset used for margin (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionId</strong></td>
+      <td>Unique identifier for the position associated with the margin operation (<code>90483119-0c3a-4cc0-9afa-25366f907fca</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>operation</strong></td>
+      <td>The type of operation performed (<code>REDUCE_MARGIN</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>createdAt</strong></td>
+      <td>Timestamp when the margin operation was created (<code>2024-09-12T08:59:57.707Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>updatedAt</strong></td>
+      <td>Timestamp when the margin operation was last updated (<code>2024-09-12T08:59:57.707Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>totalCount</strong></td>
+      <td>The total number of margin operations recorded (<code>45</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>nextTimestamp</strong></td>
+      <td>The next timestamp for fetching data (<code>1725624883814</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="get-positions">Get Positions</h2>
+
+`GET /v1/positions`
+
+Retrieves positions based on their status.
+
+It allows filtering positions by their status (e.g., "OPEN") and supports additional optional parameters such as timestamps, sorting order, page size, and trading symbol.
+
+This endpoint is useful for fetching current or historical positions and managing your trading portfolio.
+
+```python
+# Function to fetch positions
+def fetch_positions():
+position_status = input("Enter position status (open, closed, liquidated): ").upper()
+symbol = input("Enter the trading pair (e.g., BTCINR): ").upper()
+
+if position_status not in ["OPEN", "CLOSED", "LIQUIDATED"]:
+print("Invalid position status. Please enter 'open', 'closed', or 'liquidated'.")
+return
+
+# Optional parameters
+sort_order = "desc" # Default sort order
+page_size = 100 # Default page size
+
+# Prepare the query parameters
+params = {
+'sortOrder': sort_order,
+'pageSize': str(page_size),
+'symbol': symbol,
+  }
+
+# Generate current timestamp
+timestamp = str(int(time.time() * 1000))
+params['timestamp'] = timestamp
+
+# Generate signature based on the parameters
+query_string = '&'.join([f"{key}={value}" for key, value in params.items()])
+signature = generate_signature(api_secret, query_string)
+
+# Headers for the GET request
+headers = {
+'api-key': api_key,
+'signature': signature,
+'accept': '*/*'
+ }
+
+# Construct the full URL including the path parameter for position status
+full_url = f"{base_url}/v1/positions/{position_status}?{query_string}"
+
+try:
+# Send the GET request to fetch positions
+response = requests.get(full_url, headers=headers)
+response.raise_for_status() # Raises an error for 4xx/5xx responses
+response_data = response.json()
+print('Positions fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+print(f"Error: {err.response.text if err.response else err}")
+except Exception as e:
+print(f"An unexpected error occurred: {str(e)}")
+```
+
+```javascript
+async function fetchPositions() {
+  const endpoint = "/v1/positions/";
+
+  const positionStatus = "OPEN"; // Required parameter
+  const startTimestamp = "1696425435000"; // Optional
+  const endTimestamp = "1725451568979"; // Optional
+  const sortOrder = "desc"; // Optional
+  const pageSize = 100; // Optional
+  const symbol = "BTCINR"; // Optional
+
+  const params = {
+    // Optional Params
+    // pageSize: pageSize.toString(),
+    // sortOrder: sortOrder,
+    // startTimestamp: startTimestamp,
+    // endTimestamp: endTimestamp,
+    // symbol: symbol,
+  };
+  const url = `${endpoint}${positionStatus}`;
+
+// Call the getRequest function
+  return await getRequest(url, params);
+}
+
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>positionStatus</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The status of the positions to retrieve (e.g., "OPEN")</td>
+        </tr>
+        <tr>
+            <td>startTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The start timestamp (in milliseconds) for filtering positions</td>
+        </tr>
+        <tr>
+            <td>endTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The end timestamp (in milliseconds) for filtering positions</td>
+        </tr>
+        <tr>
+            <td>sortOrder</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The sorting order for the results (e.g., "asc" or "desc")</td>
+        </tr>
+        <tr>
+            <td>pageSize</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The number of results to return per page</td>
+        </tr>
+        <tr>
+            <td>symbol</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The trading pair symbol to filter positions (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response parameters are described below:
+
+```json
+{
+  "id": 5454,
+  "contractPair": "GRTINR",
+  "contractType": "PERPETUAL",
+  "entryPrice": 12.541,
+  "leverage": 10,
+  "liquidationPrice": 11.4,
+  "marginType": "ISOLATED",
+  "margin": 45.6,
+  "marginInMarginAsset": 45.6,
+  "positionAmount": 36,
+  "positionId": "8b56348d-0d5d-4de1-85e1-3325bdf84087",
+  "positionSize": 451.48,
+  "positionStatus": "OPEN",
+  "positionType": "LONG",
+  "realizedProfit": null,
+  "quantity": 36,
+  "baseAsset": "GRT",
+  "marginAsset": "INR",
+  "quoteAsset": "INR",
+  "createdTime": "2024-09-16T09:39:41.689Z",
+  "updatedTime": "2024-09-16T09:39:41.689Z"
+}
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>id</strong></td>
+      <td>Unique identifier for the position (<code>5454</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>contractPair</strong></td>
+      <td>The trading pair for the contract (<code>GRTINR</code>), indicating GRT traded against INR.</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>The type of contract (<code>PERPETUAL</code>), indicating a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>entryPrice</strong></td>
+      <td>The price at which the position was entered (<code>12.541 INR</code> per GRT).</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>The leverage applied to the trade (<code>10x</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>liquidationPrice</strong></td>
+      <td>The price at which the position would be liquidated (<code>11.4 INR</code> per GRT).</td>
+    </tr>
+    <tr>
+      <td><strong>marginType</strong></td>
+      <td>The type of margin used for the position (<code>ISOLATED</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>margin</strong></td>
+      <td>The amount of margin allocated to the position (<code>45.6 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>marginInMarginAsset</strong></td>
+      <td>The amount of margin in the margin asset (<code>45.6 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionAmount</strong></td>
+      <td>The amount of the position (<code>36 GRT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionId</strong></td>
+      <td>Unique identifier for the position (<code>8b56348d-0d5d-4de1-85e1-3325bdf84087</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionSize</strong></td>
+      <td>The size of the position in terms of value (<code>451.48 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionStatus</strong></td>
+      <td>The current status of the position (<code>OPEN</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionType</strong></td>
+      <td>The type of position (<code>LONG</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>realizedProfit</strong></td>
+      <td>The profit realized from the position (<code>null</code>, indicating no realized profit yet).</td>
+    </tr>
+    <tr>
+      <td><strong>quantity</strong></td>
+      <td>The quantity of the asset involved (<code>36 GRT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The base asset being traded (<code>GRT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>The asset used for margin (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>createdTime</strong></td>
+      <td>The timestamp when the position was created (<code>2024-09-16T09:39:41.689Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>updatedTime</strong></td>
+      <td>The timestamp when the position was last updated (<code>2024-09-16T09:39:41.689Z</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="get-position-status">Get Position Status</h2>
+
+`GET /v1/positions/{positionStatus}`
+
+Retrieves details for a specific position identified by its unique position ID.
+
+It returns information related to the specified position, such as current status, asset details, and other relevant data.
+
+```python
+def get_positions():
+ position_status = input("Enter position status (open, closed, liquidated): ").upper()
+
+  if position_status not in ["OPEN", "CLOSED", "LIQUIDATED"]:
+  print("Invalid position status. Please enter 'open', 'closed', or 'liquidated'.")
+  return
+
+# Generate the current timestamp
+    timestamp = str(int(time.time() * 1000))
+
+# Prepare the query parameters
+    params = {
+    'sortOrder': 'desc',
+    'pageSize': 100,
+    'timestamp': timestamp
+    }
+
+# Convert the params into a query string to sign
+    query_string = f"sortOrder={params['sortOrder']}&pageSize={params['pageSize']}&timestamp=
+    {params['timestamp']}"
+
+# Generate the signature
+ signature = generate_signature(api_secret, query_string)
+
+# Headers for the GET request
+headers = {
+'api-key': api_key,
+'signature': signature,
+'accept': '*/*'
+ }
+
+# Construct the full URL including the path parameter for position status
+full_url = f"{base_url}/v1/positions/{position_status}?sortOrder={params['sortOrder']}&pageSize=
+{params['pageSize']}&timestamp={params['timestamp']}"
+
+try:
+# Send the GET request to fetch positions
+response = requests.get(full_url, headers=headers)
+response.raise_for_status() # Raises an error for 4xx/5xx responses
+response_data = response.json()
+print('Positions fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+print(f"Error: {err.response.text if err.response else err}")
+except Exception as e:
+print(f"An unexpected error occurred: {str(e)}")
+```
+
+```javascript
+async function getPosition() {
+  const endpoint = "/v1/positions";
+  const positionId = "sample-2c52-45cb-addf-9c1fde92fce5";
+
+  const params = {
+    positionId,
+  };
+
+  return await getRequest(endpoint, params);
+}
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>positionId</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The unique identifier for the position to retrieve</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+```json
+// Response
+[
+    {
+        "contractPair": "BTCUSDT",
+        "entryPrice": 58003.7,
+        "leverage": 9,
+        "liquidationPrice": 52173.1,
+        "marginType": "ISOLATED",
+        "marginAsset": "INR",
+        "margin": 19.404,
+        "marginInMarginAsset": 1688.15,
+        "positionAmount": 0.003,
+        "positionId": "dd89732b-3a9d-4500-acec-64e1384c7149",
+        "positionSize": 174.0111,
+        "positionStatus": "OPEN",
+        "positionType": "LONG",
+        "realizedProfit": 0,
+        "quantity": 0.003,
+        "createdAt": "2024-09-13T08:19:18.642Z",
+        "contractType": "PERPETUAL",
+        "iconUrl": "https://storage.googleapis.com/cryptx-dev-static/contract-icons/btc.png",
+        "baseAsset": "BTC",
+        "quoteAsset": "USDT"
+    }
+]
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>contractPair</strong></td>
+      <td>The trading pair for the contract (<code>BTCUSDT</code>), indicating Bitcoin (BTC) traded against USDT (Tether).</td>
+    </tr>
+    <tr>
+      <td><strong>entryPrice</strong></td>
+      <td>The price at which the position was entered (<code>58003.7 USDT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>leverage</strong></td>
+      <td>The leverage applied to the trade (<code>9x</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>liquidationPrice</strong></td>
+      <td>The price at which the position would be liquidated (<code>52173.1 USDT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>marginType</strong></td>
+      <td>The type of margin used for the position (<code>ISOLATED</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>The asset used for margin (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>margin</strong></td>
+      <td>The amount of margin allocated to the position (<code>19.404 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>marginInMarginAsset</strong></td>
+      <td>The amount of margin in the margin asset (<code>1688.15 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionAmount</strong></td>
+      <td>The amount of the position (<code>0.003 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionId</strong></td>
+      <td>Unique identifier for the position (<code>dd89732b-3a9d-4500-acec-64e1384c7149</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionSize</strong></td>
+      <td>The size of the position in terms of value (<code>174.0111 USDT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionStatus</strong></td>
+      <td>The current status of the position (<code>OPEN</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>positionType</strong></td>
+      <td>The type of position (<code>LONG</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>realizedProfit</strong></td>
+      <td>The profit realized from the position (<code>0</code>, indicating no realized profit yet).</td>
+    </tr>
+    <tr>
+      <td><strong>quantity</strong></td>
+      <td>The quantity of the asset involved (<code>0.003 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>createdAt</strong></td>
+      <td>The timestamp when the position was created (<code>2024-09-13T08:19:18.642Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>The type of contract (<code>PERPETUAL</code>), indicating a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>iconUrl</strong></td>
+      <td>The URL for the contract icon (<code>https://storage.googleapis.com/cryptx-dev-static/contract-icons/btc.png</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The base asset being traded (<code>BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (<code>USDT</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="trade-history">Get User's Trade History</h2>
+
+`GET /v1/user-data/trade-history`
+
+Retrieves the trade history for a user.
+
+
+It supports optional filtering parameters such as timestamps, sorting order, page size, and trading symbol to help users access their historical trade data efficiently.
+
+
+```javascript
+async function fetchUserTradeHistory() {
+  const endpoint = "/v1/user-data/trade-history";
+  const startTimestamp = "1696425435000"; // Optional
+  const endTimestamp = "1725451568979"; // Optional
+  const sortOrder = "desc"; // Optional
+  const pageSize = 100; // Optional
+  const symbol = "BTCINR"; // Optional
+
+const params = {
+   //Optional Params
+    pageSize: pageSize.toString(),
+    sortOrder: sortOrder,
+    startTimestamp: startTimestamp,
+    endTimestamp: endTimestamp,
+    symbol: symbol,
+  };
+
+// Call the getRequest function
+  return await getRequest(endpoint, params);
+}
+```
+
+```python
+# Function to fetch trade history
+def trade_history():
+    timestamp = str(int(time.time() * 1000))
+    trade_history_url = "https://api.cryptxindia.com/v1/user-data/trade-history"
+
+params = {
+    sortOrder': 'desc',
+    'pageSize': 100,
+    'timestamp': timestamp
+ }
+
+query_string = f"sortOrder={params['sortOrder']}&pageSize={params['pageSize']}&timestamp=
+{params['timestamp']}"
+
+ signature = generate_signature(api_secret, query_string)
+
+ headers = {
+    'api-key': api_key,
+    'signature': signature,
+    'accept': '*/*'
+ }
+
+try:
+    response = requests.get(f"{trade_history_url}?{query_string}", headers=headers)
+    response.raise_for_status()
+    response_data = response.json()
+    print('Trade history fetched successfully:', json.dumps(response_data, indent=4))
+except requests.exceptions.HTTPError as err:
+    print(f"Failed {response.status_code}: {response.text}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>startTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The start timestamp (in milliseconds) for filtering trade history</td>
+        </tr>
+        <tr>
+            <td>endTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The end timestamp (in milliseconds) for filtering trade history</td>
+        </tr>
+        <tr>
+            <td>sortOrder</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The sorting order for the results (e.g., "asc" or "desc")</td>
+        </tr>
+        <tr>
+            <td>pageSize</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The number of results to return per page</td>
+        </tr>
+        <tr>
+            <td>symbol</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The trading pair symbol to filter trade history (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response parameters are as follows:
+
+```json
+[
+  {
+    "id": 26260,
+    "time": "2024-09-16T09:39:41.675Z",
+    "symbol": "GRTINR",
+    "type": "LIMIT",
+    "side": "BUY",
+    "price": 12.541,
+    "quantity": 36,
+    "role": "MAKER",
+    "fee": 0,
+    "realizedProfit": 0,
+    "contractType": "PERPETUAL",
+    "clientOrderId": "8acc0af94a3516126cdf-6238-ext",
+    "baseAsset": "GRT",
+    "quoteAsset": "INR",
+    "marginAsset": "INR"
+  }
+]
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>id</strong></td>
+      <td>Unique identifier for the order (<code>26260</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>time</strong></td>
+      <td>Timestamp when the order was placed (<code>2024-09-16T09:39:41.675Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>The trading pair for the order (<code>GRTINR</code>), indicating GRT (The Graph) traded against INR (Indian Rupee).</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>The type of order (<code>LIMIT</code>), indicating a limit order.</td>
+    </tr>
+    <tr>
+      <td><strong>side</strong></td>
+      <td>The side of the order (<code>BUY</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>price</strong></td>
+      <td>The price at which the order is to be executed (<code>12.541 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>quantity</strong></td>
+      <td>The quantity of the order (<code>36 GRT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>role</strong></td>
+      <td>The role of the order in the trade (<code>MAKER</code>), indicating the order added liquidity to the market.</td>
+    </tr>
+    <tr>
+      <td><strong>fee</strong></td>
+      <td>The fee charged for the order (<code>0</code>, indicating no fee).</td>
+    </tr>
+    <tr>
+      <td><strong>realizedProfit</strong></td>
+      <td>The profit realized from the order (<code>0</code>, indicating no realized profit yet).</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>The type of contract for the order (<code>PERPETUAL</code>), indicating a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Unique identifier for the client order (<code>8acc0af94a3516126cdf-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The base asset being traded (<code>GRT</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>The asset used for margin (<code>INR</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="get-transaction-history">Get User's Transaction History</h2>
+
+`GET/v1/user-data/transaction-history`
+
+Retrieves the transaction history for a user, allowing filtering and sorting based on optional parameters.
+
+It provides detailed records of transactions within the specified time range and can be filtered by trading symbol, trade ID, and position ID.
+
+```python
+def get_transaction_history():
+    # Default values for optional parameters
+    start_timestamp = None
+    end_timestamp = None
+    sort_order = 'desc'
+    page_size = 100
+    symbol = None
+    trade_id = None
+    position_id = None
+
+    # Generate the current timestamp (used as part of the authentication/signing process)
+    timestamp = str(int(time.time() * 1000))
+
+    # Prepare query parameters with required and optional fields
+    params = {
+        'sortOrder': sort_order,
+        'pageSize': page_size,
+        'timestamp': timestamp
+    }
+
+    # Include optional parameters only if they are provided
+    if start_timestamp:
+        params['startTimestamp'] = start_timestamp
+    if end_timestamp:
+        params['endTimestamp'] = end_timestamp
+    if symbol:
+        params['symbol'] = symbol
+    if trade_id:
+        params['tradeId'] = trade_id
+    if position_id:
+        params['positionId'] = position_id
+
+    # Convert the parameters to a query string to be signed
+    query_string = '&'.join([f"{key}={value}" for key, value in params.items()])
+
+    # Generate the signature (assuming `generate_signature` is defined)
+    signature = generate_signature(api_secret, query_string)
+
+    # Headers for the GET request
+    headers = {
+        'api-key': api_key,
+        'signature': signature,
+        'accept': '*/*'
+    }
+
+    # Construct the full URL with the query string
+    full_url = f"{base_url}/v1/user-data/transaction-history?{query_string}"
+
+    try:
+        # Send the GET request to fetch transaction history
+        response = requests.get(full_url, headers=headers)
+        response.raise_for_status()  # Raises an error for HTTP 4xx/5xx responses
+        response_data = response.json()
+        print('Transaction history fetched successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        # Handle specific HTTP errors
+        print(f"HTTP Error: {err.response.text if err.response else 'No response text'}")
+    except Exception as e:
+        # Handle any other exceptions
+        print(f"Failed {response.status_code}: {response.text}")
+```
+
+```javascript
+async function fetchUserTransactionHistory() {
+    const endpoint = "/v1/user-data/transaction-history";
+
+    // Optional parameters for filtering and sorting the transaction history
+    const startTimestamp = "1696425435000"; // Start timestamp in milliseconds
+    const endTimestamp = "1725451568979";   // End timestamp in milliseconds
+    const sortOrder = "desc";               // Sorting order: "asc" or "desc"
+    const pageSize = 100;                   // Number of records per page
+    const symbol = "BTCINR";                // Trading symbol, e.g., "BTCINR"
+    const tradeId = 12;                     // Specific trade ID to filter
+    const positionId = "3d5f302b-2c52-45cb-addf-9c1fde92fce5"; // Specific position ID
+
+    // Construct the query parameters object
+    const params = {
+        pageSize: pageSize.toString(),
+        sortOrder: sortOrder,
+        startTimestamp: startTimestamp,
+        endTimestamp: endTimestamp,
+        symbol: symbol,
+        tradeId: tradeId,
+        positionId: positionId,
+    };
+
+    // Call the getRequest function with the endpoint and query parameters
+    return await getRequest(endpoint, params);
+}
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>startTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The start timestamp (in milliseconds) for filtering transaction history</td>
+        </tr>
+        <tr>
+            <td>endTimestamp</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The end timestamp (in milliseconds) for filtering transaction history</td>
+        </tr>
+        <tr>
+            <td>sortOrder</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The sorting order for the results (e.g., "asc" or "desc")</td>
+        </tr>
+        <tr>
+            <td>pageSize</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The number of records to return per page</td>
+        </tr>
+        <tr>
+            <td>symbol</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The trading symbol to filter the transaction history (e.g., BTCINR)</td>
+        </tr>
+        <tr>
+            <td>tradeId</td>
+            <td>number</td>
+            <td>No</td>
+            <td>The specific trade ID to filter the transaction history</td>
+        </tr>
+        <tr>
+            <td>positionId</td>
+            <td>string</td>
+            <td>No</td>
+            <td>The specific position ID to filter the transaction history</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+```json
+[
+  {
+    "id": 109884,
+    "time": "2024-09-16T09:39:28.754Z",
+    "type": "COMMISSION",
+    "amount": -2.1,
+    "asset": "INR",
+    "symbol": "BTCINR",
+    "contractType": "PERPETUAL",
+    "baseAsset": "BTC",
+    "quoteAsset": "INR"
+  }
+]
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>id</strong></td>
+      <td>Unique identifier for the transaction (<code>109884</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>time</strong></td>
+      <td>Timestamp when the transaction occurred (<code>2024-09-16T09:39:28.754Z</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>type</strong></td>
+      <td>The type of the transaction (<code>COMMISSION</code>), indicating a commission fee.</td>
+    </tr>
+    <tr>
+      <td><strong>amount</strong></td>
+      <td>The amount of the commission fee (<code>-2.1 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>asset</strong></td>
+      <td>The asset for the commission fee (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>symbol</strong></td>
+      <td>The trading pair associated with the transaction (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>contractType</strong></td>
+      <td>The type of contract for the transaction (<code>PERPETUAL</code>), indicating a perpetual futures contract.</td>
+    </tr>
+    <tr>
+      <td><strong>baseAsset</strong></td>
+      <td>The base asset in the trading pair (<code>BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>quoteAsset</strong></td>
+      <td>The currency used for the transaction (<code>INR</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id='exchange-update-preference'>Update Preference</h2>
+
+`POST /v1/exchange/update/preference`
+
+Updates the leverage and margin-mode(Cross or Isolated) for a specified contract. It allows setting the leverage level and margin-mode for trading a particular asset or trading pair.
+
+<aside class="notice">Notes:
+<ol>
+<li><strong>Update Leverage and Margin Mode for Specific Symbols</strong></li>
+<ul>
+<li>Users can adjust the leverage and margin mode for individual symbols using the <code>/update/preference</code> endpoint.</li>
+<li>This adjustment applies only to the specified symbol.</li>
+</ul>
+<li><strong>Placing Orders</strong></li>
+<ul>
+<li>Orders will be executed with the leverage and margin mode that was previously set for the symbol.</li>
+<li>To use a different leverage or margin mode for an order, users must first update the leverage or margin mode for the symbol via the <code>/update/preference</code> endpoint.</li>
+</ul>
+</ol>
+</aside>
+
+
+```javascript
+async function updatePreference() {
+    const endpoint = "/v1/exchange/update/preference";
+
+    const leverage = 10;
+    const contractName = "BTCINR";
+    const marginMode = "CROSS"
+
+    // Prepare request payload
+    const params = {
+        leverage: leverage,       // Ensure leverage is an integer
+        marginMode: marginMode,   // Ensure marginMode is ISOLATED or CROSS
+        contractName: contractName,
+    };
+
+    // Call the postRequest function
+    return await postRequest(endpoint, params);
+}
+```
+```python
+import time
+import json
+import requests
+
+def update_preference():
+    endpoint = "/v1/exchange/update/preference"
+
+    leverage = 10  # Ensure leverage is an integer
+    contract_name = "BTCINR"  # Replace with the appropriate contract name
+    margin_mode = "CROSS"  # Ensure marginMode is either 'ISOLATED' or 'CROSS'
+
+    # Generate the current timestamp
+    timestamp = str(int(time.time() * 1000))
+
+    # Prepare the request body (JSON)
+    params = {
+        'leverage': leverage,
+        'marginMode': margin_mode,
+        'contractName': contract_name,
+        'timestamp': timestamp
+    }
+
+    # Convert the request body to a JSON string for signing
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+
+    # Generate the signature (ensure `generate_signature` is properly defined)
+    signature = generate_signature(api_secret, data_to_sign)
+
+    # Headers for the POST request
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature
+    }
+
+    # Construct the full URL
+    update_preference_url = f"{base_url}{endpoint}"
+
+    try:
+        # Send the POST request to update the preference
+        response = requests.post(update_preference_url, json=params, headers=headers)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+        response_data = response.json()
+        print('Preference updated successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        print(f"Error: {err.response.text if err.response else err}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>leverage</td>
+            <td>number</td>
+            <td>Yes</td>
+            <td>The leverage level to set for the contract (e.g., 10). Must be an integer.</td>
+        </tr>
+        <tr>
+            <td>marginMode</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>Margin mode to set for the contract (CROSS/ISOLATED). Must be a string</td>
+        </tr>
+        <tr>
+            <td>contractName</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair or contract name to which the leverage applies (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response parameters are described below:
+
+```json
+// Response
+{
+  "contractName": "ETHINR",
+  "marginMode": "CROSS",
+  "updatedLeverage": 10
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>contractName</strong></td>
+      <td>The name of the contract (<code>ETHINR</code>), indicating Ethereum (ETH) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>marginMode</strong></td>
+      <td>Updated margin mode for (<code>ETHINR</code>) is (</code>CROSS</code>)</td>
+    </tr>
+    <tr>
+      <td><strong>updatedLeverage</strong></td>
+      <td>The updated leverage for the contract (<code>10</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<h2 id='exchange-update-leverage'>Update Leverage</h2>
+
+`POST /v1/exchange/update/leverage`
+
+Updates the leverage for a specified contract. It allows setting the leverage level for trading a particular asset or trading pair.
+
+This endpoint is used to adjust the leverage settings for risk management and trading strategies.
+
+<aside class="notice">Notes:
+<ol>
+<li><strong>Update Leverage for Specific Symbols</strong></li>
+<ul>
+<li>Users can adjust the leverage for individual symbols using the <code>/update/leverage </code> endpoint.</li>
+<li>This adjustment applies only to the specified symbol.</li>
+</ul>
+<li><strong>Placing Orders</strong></li>
+<ul>
+<li>Orders will be executed with the leverage that was previously set for the symbol.</li>
+<li>To use a different leverage for an order, users must first update the leverage for the symbol via the <code>/update/leverage</code> endpoint.</li>
+</ul>
+</ol>
+</aside>
+
+
+```javascript
+async function updateLeverage() {
+    const endpoint = "/v1/exchange/update/leverage";
+
+    const leverage = 10;
+    const contractName = "BTCINR";
+
+    // Prepare request payload
+    const params = {
+        leverage: leverage,       // Ensure leverage is an integer
+        contractName: contractName,
+    };
+
+    // Call the postRequest function
+    return await postRequest(endpoint, params);
+}
+```
+```python
+def update_leverage():
+  leverage = int(input("Enter the leverage value: "))
+  contract_name = input("Enter the contract name: ")
+
+  # Generate the current timestamp
+  timestamp = str(int(time.time() * 1000))
+
+  # Prepare the request body (JSON)
+  params = {
+      'leverage': int(leverage),
+      'contractName': contract_name,
+      'timestamp': timestamp
+  }
+
+  # Convert the request body to a JSON string for signing
+  data_to_sign = json.dumps(params, separators=(',', ':'))
+
+  # Generate the signature
+  signature = generate_signature(api_secret, data_to_sign)
+
+  # Headers for the POST request
+  headers = {
+      'api-key': api_key,
+      'Content-Type': 'application/json',
+      'signature': signature
+  }
+
+  # Construct the full URL
+  update_leverage_url = f"{base_url}/v1/exchange/update/leverage"
+
+  try:
+      # Send the POST request to update the leverage
+      response = requests.post(update_leverage_url, json=params, headers=headers)
+      response.raise_for_status() # Raises an error for 4xx/5xx responses
+      response_data = response.json()
+      print('Leverage updated successfully:', json.dumps(response_data, indent=4))
+  except requests.exceptions.HTTPError as err:
+      print(f"Error: {err.response.text if err.response else err}")
+  except Exception as e:
+      print(f"An unexpected error occurred: {str(e)}")
+```
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>leverage</td>
+            <td>number</td>
+            <td>Yes</td>
+            <td>The leverage level to set for the contract (e.g., 10). Must be an integer.</td>
+        </tr>
+        <tr>
+            <td>contractName</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair or contract name to which the leverage applies (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+The response parameters are described below:
+
+```json
+// Response
+{
+  "updatedLeverage": 10,
+  "contractName": "ETHINR"
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>updatedLeverage</strong></td>
+      <td>The updated leverage for the contract (<code>10</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>contractName</strong></td>
+      <td>The name of the contract (<code>ETHINR</code>), indicating Ethereum (ETH) traded against Indian Rupee (INR).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="delete-order"> Deleting an Order</h2>
+
+`DELETE /v1/order/delete-order`
+
+deletes a specific order based on its client order ID.
+
+It requires the client order ID (`clientOrderID`) to identify the order to be deleted and a timestamp for request validation.
+
+```javascript
+async function deleteOrder() {
+    const endpoint = "/v1/order/delete-order";
+    const clientOrderId = "a9c5ba9893c99828e4b5-6238-ext";
+    const timestamp = Date.now().toString();
+
+    // Prepare request payload
+    const params = {
+        clientOrderId: clientOrderId,
+        timestamp: timestamp,
+    };
+
+    // Call the deleteRequest function
+    return await deleteRequest(endpoint, params);
+}
+```
+
+```python
+def delete_order():
+    client_order_id = input("Enter the clientOrderId to delete: ")
+    delete_order_url = "https://api.cryptxindia.com/v1/order/delete-order"
+
+    timestamp = str(int(time.time() * 1000))
+
+    params = {
+        'clientOrderId': client_order_id,
+        'timestamp': timestamp
+    }
+
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+    signature = generate_signature(api_secret, data_to_sign)
+
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature,
+    }
+
+    try:
+        response = requests.delete(delete_order_url, json=params, headers=headers)
+        response.raise_for_status()
+        print(f"Order with clientOrderId {client_order_id} deleted successfully.")
+    except requests.exceptions.HTTPError as err:
+        print(f"Failed {response.status_code}: {response.text}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>clientOrderId</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The unique identifier for the order to be deleted (e.g., a9c5ba9893c99828e4b5-6238-ext)</td>
+        </tr>
+        <tr>
+            <td>timestamp</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The current timestamp (in milliseconds) for request validation</td>
+        </tr>
+    </tbody>
+</table>
+
+<aside class="notice">
+Requires <code>clientOrderId</code> that can be retrieved from <a href="#get-open-orders">Get Open Orders API</a>.
+</aside>
+
+### Response
+
+```json
+{
+  "clientOrderId": "93513fe2a8af44157234-6238-ext",
+  "orderId": 24717,
+  "status": "CANCELED",
+  "success": true
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Unique identifier for the client order (<code>93513fe2a8af44157234-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>orderId</strong></td>
+      <td>Unique identifier for the order (<code>24717</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>The status of the order (<code>CANCELED</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>success</strong></td>
+      <td>Indicates whether the operation was successful (<code>true</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="cancel-all-orders">Cancel all the orders</h2>
+
+`DELETE /v1/order/cancel-all-orders`
+
+Deletes all the open orders.
+
+```javascript
+async function cancelAllOrders() {
+    const endpoint = "/v1/order/cancel-all-orders";
+    const timestamp = Date.now().toString();
+
+    // Prepare request payload
+    const params = {
+        timestamp: timestamp,
+    };
+
+    // Call the deleteRequest function
+    return await deleteRequest(endpoint, params);
+}
+```
+
+```python
+import time
+import json
+import requests
+
+def cancel_all_orders():
+    endpoint = "/v1/order/cancel-all-orders"
+
+    # Generate the current timestamp
+    timestamp = str(int(time.time() * 1000))
+
+    # Prepare the request payload
+    params = {
+        'timestamp': timestamp
+    }
+
+    # Convert the request body to a JSON string for signing
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+
+    # Generate the signature (ensure `generate_signature` is properly defined)
+    signature = generate_signature(api_secret, data_to_sign)
+
+    # Headers for the DELETE request
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature
+    }
+
+    # Construct the full URL
+    cancel_orders_url = f"{base_url}{endpoint}"
+
+    try:
+        # Send the DELETE request to cancel all orders
+        response = requests.delete(cancel_orders_url, json=params, headers=headers)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+        response_data = response.json()
+        print('All orders canceled successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        print(f"Failed {response.status_code}: {response.text}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>timestamp</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The current timestamp (in milliseconds) for request validation</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "clientOrderId": "02f8c7b42c904b5475b6-6238-ext",
+      "status": "CANCELED",
+      "message": "Order is cancelled"
+    },
+  ]
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>clientOrderId</strong></td>
+      <td>Unique identifier for the client order (<code>93513fe2a8af44157234-6238-ext</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>The status of the order (<code>CANCELED</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>message</strong></td>
+      <td>Order is cancelled.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="close-all-positions">Close all the positions</h2>
+
+`DELETE /v1/positions/close-all-positions`
+
+Closes all the Positions.
+
+```javascript
+async function closeAllPositions() {
+    const endpoint = "/v1/positions/close-all-positions";
+    const timestamp = Date.now().toString();
+
+    // Prepare request payload
+    const params = {
+        timestamp: timestamp,
+    };
+
+    // Call the deleteRequest function
+    return await deleteRequest(endpoint, params);
+}
+```
+
+```python
+import time
+import json
+import requests
+
+def close_all_positions():
+    endpoint = "/v1/positions/close-all-positions"
+
+    # Generate the current timestamp
+    timestamp = str(int(time.time() * 1000))
+
+    # Prepare the request payload
+    params = {
+        'timestamp': timestamp
+    }
+
+    # Convert the request body to a JSON string for signing
+    data_to_sign = json.dumps(params, separators=(',', ':'))
+
+    # Generate the signature (ensure `generate_signature` is properly defined)
+    signature = generate_signature(api_secret, data_to_sign)
+
+    # Headers for the DELETE request
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json',
+        'signature': signature
+    }
+
+    # Construct the full URL
+    cancel_orders_url = f"{base_url}{endpoint}"
+
+    try:
+        # Send the DELETE request to cancel all orders
+        response = requests.delete(cancel_orders_url, json=params, headers=headers)
+        response.raise_for_status()  # Raises an error for 4xx/5xx responses
+        response_data = response.json()
+        print('All orders canceled successfully:', json.dumps(response_data, indent=4))
+    except requests.exceptions.HTTPError as err:
+        print(f"Failed {response.status_code}: {response.text}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>timestamp</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The current timestamp (in milliseconds) for request validation</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "positionId": "2d29687c-2aab-4378-ada3-f18ecb73b332",
+      "status": "CLOSED",
+      "message": "Position is closed."
+    }
+  ]
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>positionId</strong></td>
+      <td>Unique identifier for the position (<code>2d29687c-2aab-4378-ada3-f18ecb73b332</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>status</strong></td>
+      <td>The status of the order (<code>CLOSED</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>message</strong></td>
+      <td>Position is closed.</td>
+    </tr>
+  </tbody>
+</table>
+
+<%# Wallets %>
+
+<h2 id="futures-wallet-details">Get futures wallet details</h2>
+
+`GET /v1/wallet/futures-wallet/details`
+
+Get all details of Futures wallet.
+
+```javascript
+async function getFuturesWallet() {
+  const params = {
+    // Optional Params
+    marginAsset: "INR"
+  };
+
+  const endpoint = "/v1/wallet/futures-wallet/details";
+
+  // Call the postRequest function
+  return await getRequest(endpoint, params);
+}
+```
+
+```python
+import requests
+import hmac
+import hashlib
+import time
+import json
+
+def generate_signature(api_secret, data_to_sign):
+  return hmac.new(api_secret.encode('utf-8'), data_to_sign.encode('utf-8'), hashlib.sha256).hexdigest()
+
+def get_futures_wallet_details():
+  endpoint = "/v1/wallet/futures-wallet/details"
+
+  # Generate the current timestamp
+  timestamp = str(int(time.time() * 1000))
+
+  # Optional parameters with timestamp
+  params = {
+      'marginAsset': 'INR',
+      'timestamp': timestamp
+  }
+
+  query_string = f"marginAsset={params['marginAsset']}&timestamp={params['timestamp']}"
+
+  # Generate the signature (ensure `generate_signature` is properly defined)
+  signature = generate_signature(api_secret, query_string)
+
+  # Headers for the GET request
+  headers = {
+      'api-key': api_key,
+      'signature': signature
+  }
+
+  # Construct the full URL
+  wallet_details_url = f"{base_url}{endpoint}?{query_string}"
+
+  try:
+      # Send the GET request to fetch the futures wallet details
+      response = requests.get(wallet_details_url, headers=headers)
+      response.raise_for_status()  # Raises an error for 4xx/5xx responses
+      response_data = response.json()
+      print('Futures wallet details:', json.dumps(response_data, indent=4))
+  except requests.exceptions.HTTPError as err:
+      print(f"Failed {response.status_code}: {response.text}")
+  except Exception as e:
+      print(f"An unexpected error occurred: {str(e)}")
+```
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>timestamp</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The current timestamp (in milliseconds) for request validation</td>
+        </tr>
+        <tr>
+            <td>marginAsset</td>
+            <td>string</td>
+            <td>No</td>
+            <td>MarginAsset of Futures wallet (<code>INR</code>).</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+```json
+// Response
+{
+  "inrBalance": "1941.50",
+  "walletBalance": "1941.50",
+  "withdrawableBalance": "1468.50",
+  "maintenanceMargin": "0.00",
+  "unrealisedPnlCross": "0.00",
+  "unrealisedPnlIsolated": "0.00",
+  "maxWithdrawableBalance": "1468.50",
+  "lockedBalance": "473.00",
+  "marginBalance": "1468.52",
+  "pnlPercentCross": "0.00",
+  "pnlPercentIsolated": "0.00",
+  "lockedBalanceCross": "0.00",
+  "lockedBalanceIsolated": "473.00",
+  "marginAsset": "INR"
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>inrBalance</strong></td>
+      <td>INR balance of Futures wallet (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>walletBalance</strong></td>
+      <td>Total wallet balance in INR.</td>
+    </tr>
+    <tr>
+      <td><strong>withdrawableBalance</strong></td>
+      <td>Amount of INR that can be withdrawn from the wallet.</td>
+    </tr>
+    <tr>
+      <td><strong>maintenanceMargin</strong></td>
+      <td>Amount of INR locked as maintenance margin.</td>
+    </tr>
+    <tr>
+      <td><strong>unrealisedPnlCross</strong></td>
+      <td>Unrealized profit and loss (PnL) in cross margin mode in INR.</td>
+    </tr>
+    <tr>
+      <td><strong>unrealisedPnlIsolated</strong></td>
+      <td>Unrealized profit and loss (PnL) in isolated margin mode in INR.</td>
+    </tr>
+    <tr>
+      <td><strong>maxWithdrawableBalance</strong></td>
+      <td>Maximum amount of INR that can be withdrawn, factoring in margins and locked funds.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedBalance</strong></td>
+      <td>Total locked balance in INR, which cannot be withdrawn or used.</td>
+    </tr>
+    <tr>
+      <td><strong>marginBalance</strong></td>
+      <td>Total margin balance in INR, including any unrealized PnL.</td>
+    </tr>
+    <tr>
+      <td><strong>pnlPercentCross</strong></td>
+      <td>Percentage of unrealized PnL in cross margin mode.</td>
+    </tr>
+    <tr>
+      <td><strong>pnlPercentIsolated</strong></td>
+      <td>Percentage of unrealized PnL in isolated margin mode.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedBalanceCross</strong></td>
+      <td>Amount of INR locked in cross margin mode.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedBalanceIsolated</strong></td>
+      <td>Amount of INR locked in isolated margin mode.</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>Asset type used for margin, in this case, INR.</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h2 id="funding-wallet-details">Get funding wallet details</h2>
+
+`GET /v1/wallet/funding-wallet/details`
+
+Get details of funding wallet.
+
+```javascript
+async function getFundingWallet() {
+  const params = {
+    // Optional Params
+    marginAsset: "INR"
+  };
+
+  const endpoint = "/v1/wallet/funding-wallet/details";
+
+  // Call the postRequest function
+  return await getRequest(endpoint, params);
+}
+```
+
+```python
+import requests
+import hmac
+import hashlib
+import time
+import json
+
+def generate_signature(api_secret, data_to_sign):
+  return hmac.new(api_secret.encode('utf-8'), data_to_sign.encode('utf-8'), hashlib.sha256).hexdigest()
+
+def get_futures_wallet_details():
+  endpoint = "/v1/wallet/funding-wallet/details"
+
+  # Generate the current timestamp
+  timestamp = str(int(time.time() * 1000))
+
+  # Optional parameters with timestamp
+  params = {
+      'marginAsset': 'INR',
+      'timestamp': timestamp
+  }
+
+  query_string = f"marginAsset={params['marginAsset']}&timestamp={params['timestamp']}"
+
+  # Generate the signature (ensure `generate_signature` is properly defined)
+  signature = generate_signature(api_secret, query_string)
+
+  # Headers for the GET request
+  headers = {
+      'api-key': api_key,
+      'signature': signature
+  }
+
+  # Construct the full URL
+  wallet_details_url = f"{base_url}{endpoint}?{query_string}"
+
+  try:
+      # Send the GET request to fetch the futures wallet details
+      response = requests.get(wallet_details_url, headers=headers)
+      response.raise_for_status()  # Raises an error for 4xx/5xx responses
+      response_data = response.json()
+      print('Funding wallet details:', json.dumps(response_data, indent=4))
+  except requests.exceptions.HTTPError as err:
+      print(f"Failed {response.status_code}: {response.text}")
+  except Exception as e:
+      print(f"An unexpected error occurred: {str(e)}")
+```
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>timestamp</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The current timestamp (in milliseconds) for request validation</td>
+        </tr>
+        <tr>
+            <td>marginAsset</td>
+            <td>string</td>
+            <td>No</td>
+            <td>MarginAsset of Futures wallet (<code>INR</code>).</td>
+        </tr>
+    </tbody>
+</table>
+
+### Response
+
+```json
+// Response
+{
+  "inrBalance": "601.00",
+  "walletBalance": "601.00",
+  "withdrawableBalance": "601.00",
+  "lockedBalance": "0.00",
+  "marginAsset": "INR"
+}
+```
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>inrBalance</strong></td>
+      <td>INR balance of Futures wallet (<code>INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>walletBalance</strong></td>
+      <td>Total wallet balance in INR.</td>
+    </tr>
+    <tr>
+      <td><strong>withdrawableBalance</strong></td>
+      <td>Amount of INR that can be withdrawn from the wallet.</td>
+    </tr>
+    <tr>
+      <td><strong>lockedBalance</strong></td>
+      <td>Total locked balance in INR, which cannot be withdrawn or used.</td>
+    </tr>
+    <tr>
+      <td><strong>marginAsset</strong></td>
+      <td>Asset type used for margin, in this case, INR.</td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,902 @@
+<h1 id='fawss-market-data-streams-web-socket-public'>FAWSS Market Data Streams Web Socket: Public</h1>
+
+Base URL : https://pilot-fawss.pi42.com/
+Connection creation: Use <strong>socket.io-client</strong> library for the connection.</p>
+
+<p><code>import io from &#39;socket.io-client&#39;;</code></p>
+
+<p><code>const socketClient = io(&#39;https://testnet-fawss.pi42.com&#39;);</code></p>
+<h2 id='live-subscribing-unsubscribing-to-streams'>Live Subscribing/Unsubscribing to streams</h2>
+<p>The following data can be sent through the web socket instance in order to subscribe/unsubscribe from streams. </p>
+<h3 id='subscribe-to-a-stream'>Subscribe to a stream</h3>
+<p>Need to write some text header</p>
+
+<blockquote>
+<p>Sample code for subscription </p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+    socketClient.emit('subscribe', {
+        params: [
+          'btcinr@kline_1m',
+          'btcinr@markPrice'
+          'btcinr@markPrice'
+        ],
+      });
+</code></pre></div><h3 id='unsubscribe-to-a-stream'>Unsubscribe to a stream</h3>
+<blockquote>
+<p>Sample code for Unsubscription</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>socketClient.emit('unsubscribe', {
+  params: [
+    'btcinr@kline_1m',
+    'btcinr@markPrice'
+  ],
+});
+</code></pre></div><h3 id='event-listening'>Event Listening</h3>
+<p>If event name is “kline”, you can see the example below for how to listen to the stream data</p>
+
+<blockquote>
+<p>Example for Event Listening </p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>  socketClient.on('kline', (data) =&gt; {
+  // console.log(data);
+});
+</code></pre></div><h2 id='trade-streams'>Trade Streams</h2>
+<p>Stream Name: <symbol>@aggTrade , eg: btcinr@aggTrade <br/>
+Listening Event Name: aggTrade <br/>
+Description: The Trade Streams push market trade information every 250 milliseconds (if existed). <br/>
+Update Speed: 250ms</p>
+<h3 id='response'>Response</h3>
+<p>This is a JSON payload representing an aggregated trade event for a trading pair (BTCINR, which is Bitcoin to Indian Rupee) on a cryptocurrency exchange. </p>
+
+<p>Here&#39;s a breakdown of each field:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>e</td>
+<td>Event type (aggTrade in this case, meaning aggregated trade)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Event time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>a</td>
+<td>Aggregate trade ID (a unique identifier for this aggregated trade)</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Symbol (the trading pair, BTCINR)</td>
+</tr>
+<tr>
+<td>p</td>
+<td>Price (the price at which the trade occurred, 4264989.9 INR)</td>
+</tr>
+<tr>
+<td>q</td>
+<td>Quantity (the quantity of the asset traded, 5.029 BTC)</td>
+</tr>
+<tr>
+<td>f</td>
+<td>First trade ID (the trade ID of the first trade in the aggregation)</td>
+</tr>
+<tr>
+<td>l</td>
+<td>Last trade ID (the trade ID of the last trade in the aggregation)</td>
+</tr>
+<tr>
+<td>T</td>
+<td>Trade time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>m</td>
+<td>Is the buyer the market maker? (true indicates the buyer is the market maker)</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>Sample response for Trade Streams</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+  e: 'aggTrade', // Event type
+  E: 1707634200153, // Event time
+  a: 166326960, // Aggregate trade ID
+  s: 'BTCINR', // Symbol
+  p: '4264989.9', // Price
+  q: '5.029', // Quantity
+  f: 279997733, // First trade ID
+  l: 279997733, // Last trade ID
+  T: 1707634199985, // Trade time
+  m: true // Is the buyer the market maker?
+}
+</code></pre></div><h2 id='mark-price-stream'>Mark Price Stream</h2>
+<p>Stream Name: <symbol>@markPrice , eg: btcinr@markPrice <br/>
+Listening Event Name: markPriceUpdate <br/>
+Description: Mark price and funding rate for a single symbol pushed every second.<br/>
+Update Speed: 1000ms</p>
+<h3 id='response-2'>Response</h3>
+<p>This JSON payload represents a mark price update event for the BTCINR trading pair on a cryptocurrency exchange. </p>
+
+<p>Here is the breakdown of each field:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>e</td>
+<td>Event type (markPriceUpdate indicates a mark price update event)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Event time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Symbol (the trading pair, BTCINR)</td>
+</tr>
+<tr>
+<td>p</td>
+<td>Market price (the current market price, 4334823.66859808 INR)</td>
+</tr>
+<tr>
+<td>P</td>
+<td>Estimated Settle Price (the estimated settle price, useful in the last hour before settlement, 4335379.542328075 INR)</td>
+</tr>
+<tr>
+<td>i</td>
+<td>Index price (the index price, 4336589.925536482 INR)</td>
+</tr>
+<tr>
+<td>r</td>
+<td>Funding rate (the current funding rate, -0.0027)</td>
+</tr>
+<tr>
+<td>T</td>
+<td>Next funding time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>lr</td>
+<td>Last funding rate (the last funding rate, -0.0017)</td>
+</tr>
+</tbody></table>
+
+<p>This payload provides important information about the mark price and related metrics, which are used for calculating funding rates and settling contracts in futures trading.</p>
+
+<blockquote>
+<p>Sample response for Market Price Stream</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+  e: 'markPriceUpdate',// Event type
+  E: 1707634490000,// Event time
+  s: 'BTCINR',// Symbol
+  p: '4334823.66859808',// Market price
+  P: '4335379.542328075',// Estimated Settle Price, only useful in the last hour before the settlement starts
+  i: '4336589.925536482',// Index price
+  r: '-0.0027',// Funding rate
+  T: 1707638400000,// Next funding time
+  lr: '-0.0017'// Last funding rate
+}
+</code></pre></div><h2 id='kline-candlestick-streams'>Kline/Candlestick Streams</h2>
+<p>Kline/Candlestick chart intervals:</p>
+
+<p>m -&gt; minutes; h -&gt; hours; d -&gt; days; w -&gt; weeks; M -&gt; months
+1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M</p>
+
+<p>Stream Name: <symbol>@kline_<interval> , eg: btcinr@kline_1m</p>
+
+<p>Listening Event Name: kline</p>
+
+<p>Description: The Kline/Candlestick Stream push updates to the current klines/candlestick every 250 milliseconds (if existed).</p>
+
+<p>Update Speed: 250ms</p>
+<h3 id='response-3'>Response</h3>
+<p>This JSON payload represents a continuous kline (candlestick) data event for the BTCINR trading pair on a cryptocurrency exchange. This payload is used for providing detailed real-time kline data, which is essential for technical analysis and trading strategies in cryptocurrency markets.</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>e</td>
+<td>Event type (continuous_kline indicates a continuous kline event)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Event time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>ps</td>
+<td>Pair (the trading pair, BTCINR)</td>
+</tr>
+<tr>
+<td>ct</td>
+<td>Contract type (in this case, PERPETUAL, indicating a perpetual futures contract)</td>
+</tr>
+<tr>
+<td>t</td>
+<td>Kline start time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>T</td>
+<td>Kline close time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>i</td>
+<td>Interval (the interval of the kline, here it is 1m for 1 minute)</td>
+</tr>
+<tr>
+<td>f</td>
+<td>First update ID (the update ID of the first trade in the kline)</td>
+</tr>
+<tr>
+<td>L</td>
+<td>Last update ID (the update ID of the last trade in the kline)</td>
+</tr>
+<tr>
+<td>o</td>
+<td>Open price (the price at the beginning of the kline, 4267543.1 INR)</td>
+</tr>
+<tr>
+<td>c</td>
+<td>Close price (the price at the end of the kline, 4267543.1 INR)</td>
+</tr>
+<tr>
+<td>h</td>
+<td>High price (the highest price during the kline interval, 4315208.1 INR)</td>
+</tr>
+<tr>
+<td>l</td>
+<td>Low price (the lowest price during the kline interval, 4267543.1 INR)</td>
+</tr>
+<tr>
+<td>v</td>
+<td>Volume (the volume of the asset traded during the kline interval, 24.646 BTC)</td>
+</tr>
+<tr>
+<td>n</td>
+<td>Number of trades (the number of trades that occurred during the kline interval, 1)</td>
+</tr>
+<tr>
+<td>x</td>
+<td>Is this kline closed? (false indicates the kline is still open)</td>
+</tr>
+<tr>
+<td>q</td>
+<td>Quote asset volume (null in this case, could represent the volume of the quote currency)</td>
+</tr>
+<tr>
+<td>V</td>
+<td>Taker buy volume (null in this case, could represent the volume bought by takers)</td>
+</tr>
+<tr>
+<td>Q</td>
+<td>Taker buy quote asset volume (null in this case, could represent the quote asset volume bought by takers)</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Ignore (additional field to be ignored)</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>Sample response for Klines</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+  "e": "continuous_kline",   // Event type
+  "E": 1707634920073,        // Event time
+  "ps": "BTCINR",            // Pair
+  "ct": "PERPETUAL",         // Contract type
+  "k": {
+    "t": 1707634920000,      // Kline start time
+    "T": 1707634979999,      // Kline close time
+    "i": "1m",               // Interval
+    "f": 1,                  // First updateId
+    "L": 1,                  // Last updateId
+    "o": "4267543.1",        // Open price
+    "c": "4267543.1",        // Close price
+    "h": "4315208.1",        // High price
+    "l": "4267543.1",        // Low price
+    "v": "24.646",           // Volume
+    "n": 1,                  // Number of trades
+    "x": false,              // Is this kline closed?
+    "q": null,               // Quote asset volume (null in this case)
+    "V": null,               // Taker buy volume (null in this case)
+    "Q": null,               // Taker buy quote asset volume (null in this case)
+    "B": null                // Ignore
+  }
+}
+</code></pre></div><h2 id='individual-symbol-ticker-streams'>Individual Symbol Ticker Streams</h2>
+<p><strong>Stream Name</strong>: <symbol>@ticker , eg: btcinr@ticker <br/>
+<strong>Listening Event Name</strong>: 24hrTicker <br/>
+<strong>Description</strong>: 24hr rolling window ticker statistics for a single symbol. These are NOT the statistics of the UTC day, but a 24hr rolling window from <code>requestTime</code> to 24hrs before.<br/>
+<strong>Update Speed</strong>: 2000ms</p>
+<h3 id='response-4'>Response</h3>
+<p>This JSON payload represents a 24-hour ticker event for the BTCINR trading pair on a cryptocurrency exchange. </p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>e</td>
+<td>Event type (24hrTicker indicates a 24-hour ticker event)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Event time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Symbol (the trading pair, BTCINR)</td>
+</tr>
+<tr>
+<td>p</td>
+<td>Price change (the absolute price change over the last 24 hours, 87845.124 INR)</td>
+</tr>
+<tr>
+<td>P</td>
+<td>Price change percent (the percentage price change over the last 24 hours, 2.116%)</td>
+</tr>
+<tr>
+<td>w</td>
+<td>Weighted average price (the weighted average price over the last 24 hours, 4188295.5225 INR)</td>
+</tr>
+<tr>
+<td>c</td>
+<td>Last price (the last traded price, 4239633.639 INR)</td>
+</tr>
+<tr>
+<td>Q</td>
+<td>Last quantity (the quantity of the last trade, 0.003 BTC)</td>
+</tr>
+<tr>
+<td>o</td>
+<td>Open price (the price at the start of the 24-hour period, 4151788.515 INR)</td>
+</tr>
+<tr>
+<td>h</td>
+<td>High price (the highest price over the last 24 hours, 4267566 INR)</td>
+</tr>
+<tr>
+<td>l</td>
+<td>Low price (the lowest price over the last 24 hours, 4112704.2840000005 INR)</td>
+</tr>
+<tr>
+<td>v</td>
+<td>Total traded base asset volume (the total volume of BTC traded over the last 24 hours, 222797.117 BTC)</td>
+</tr>
+<tr>
+<td>q</td>
+<td>Total traded quote asset volume (the total volume of INR traded over the last 24 hours, 10626810856.19 INR)</td>
+</tr>
+<tr>
+<td>O</td>
+<td>Statistics open time (timestamp in milliseconds marking the start of the 24-hour period)</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Statistics close time (timestamp in milliseconds marking the end of the 24-hour period)</td>
+</tr>
+<tr>
+<td>F</td>
+<td>First trade ID (the trade ID of the first trade in the 24-hour period, 4575372791)</td>
+</tr>
+<tr>
+<td>L</td>
+<td>Last trade ID (the trade ID of the last trade in the 24-hour period, 4578191477)</td>
+</tr>
+<tr>
+<td>n</td>
+<td>Total number of trades (the total number of trades that occurred over the last 24 hours, 2818668)</td>
+</tr>
+</tbody></table>
+
+<p>The payload provides comprehensive statistics for the BTCINR trading pair over the last 24 hours, which is useful for traders and analysts monitoring market performance.</p>
+
+<blockquote>
+<p>Sample response for Symbol Ticker Streams</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+  "e": "24hrTicker",                  // Event type
+  "E": 1707635719309,                 // Event time
+  "s": "BTCINR",                      // Symbol
+  "p": "87845.124",                   // Price change
+  "P": "2.116",                       // Price change percent
+  "w": "4188295.5225",                // Weighted average price
+  "c": "4239633.639",                 // Last price
+  "Q": "0.003",                       // Last quantity
+  "o": "4151788.515",                 // Open price
+  "h": "4267566",                     // High price
+  "l": "4112704.2840000005",          // Low price
+  "v": "222797.117",                  // Total traded base asset volume
+  "q": "10626810856.19",              // Total traded quote asset volume
+  "O": 1707549300000,                 // Statistics open time
+  "C": 1707635719307,                 // Statistics close time
+  "F": 4575372791,                    // First trade ID
+  "L": 4578191477,                    // Last trade ID
+  "n": 2818668                        // Total number of trades
+}
+</code></pre></div><h2 id='order-book-or-depth-updates'>Order Book or Depth updates</h2>
+<p>Stream Name: <symbol>@depth_<depthGrouping> , eg: btcinr@depth_0.1 <br/>
+Depth grouping Value: This value is symbol specific.<br/>
+Fetch all symbols data from <code>https://testnet-api.pi42.exchange/v1/exchange/exchangeInfo</code> api. <br/>
+For each symbol there is a value named <code>depthGrouping</code>, take the 0 indexed value for this.<br/>
+Listening Event Name: depthUpdate <br/>
+Description: Top 20 bids and asks. <br/>
+Update Speed: 250ms</p>
+<h3 id='response-5'>Response</h3>
+<p>This JSON payload represents a depth update event for the BTCINR trading pair on a cryptocurrency exchange. Depth updates provide information about changes in the order book, specifically updates to bids (buy orders) and asks (sell orders). </p>
+
+<p>Here&#39;s a detailed breakdown of each field:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>e</td>
+<td>Event type (depthUpdate indicates an order book depth update event)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Event time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>T</td>
+<td>Transaction time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Symbol (the trading pair, BTCINR)</td>
+</tr>
+<tr>
+<td>U</td>
+<td>Final update ID in event</td>
+</tr>
+<tr>
+<td>u</td>
+<td>First update ID in event</td>
+</tr>
+<tr>
+<td>pu</td>
+<td>Previous final update ID</td>
+</tr>
+<tr>
+<td>Bids (b array)</td>
+<td>The b array contains lists representing updated bids. <br/>Each list contains:</td>
+</tr>
+</tbody></table>
+
+<ul>
+<li>Price value <br/></li>
+<li>Quantity
+Asks (a array)| The a array contains lists representing updated asks.  <br/> Each list contains:</li>
+<li>Price value <br/></li>
+<li>Quantity <br/></li>
+</ul>
+
+<p>This payload provides real-time updates to the order book, allowing traders to see the most recent changes in the bids and asks for the BTCINR trading pair. This information is crucial for understanding the current market depth and making informed trading decisions.</p>
+
+<blockquote>
+<p>Sample response for Order Book Updates</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+  "e": "depthUpdate",   // Event type
+  "E": 1707636353921,   // Event time
+  "T": 1707636353915,   // Transaction time
+  "s": "BTCINR",        // Symbol
+  "U": 3960811287130,   // Final update ID in event
+  "u": 3960811297623,   // First update ID in event
+  "pu": 3960811281312, // Previous final update ID
+  "b": [               // Bids to be updated
+    [ 
+      '4240107.8', // Price Value
+      '0.710' // Quantity
+    ],
+    [ 
+      '4240116.5', 
+      '0.230' 
+    ],
+  ],
+  "a": [ // Asks to be updated
+    [ 
+      '4240353.6', // Price Value
+      '17.892' // Quantity
+    ],
+    [ 
+      '4240362.4',
+      '1.206'
+    ],
+  ]
+}
+</code></pre></div><h3 id='sum-calculation'>Sum calculation</h3>
+<p>Sum field will be calculated in the client side.</p>
+
+<ol>
+<li>Bid/Buy: For example these are the data sets for bid(buy)</li>
+</ol>
+
+<p><code>
+ [
+      [ &#39;4240142.9&#39;, &#39;1.108&#39; ], // Best Bid [price, quantity] <br/>
+      [ &#39;4240134.1&#39;, &#39;0.144&#39; ],<br/>
+      [ &#39;4240125.3&#39;, &#39;0.268&#39; ], <br/>
+      [ &#39;4240116.5&#39;, &#39;0.230&#39; ]
+  ]
+</code></p>
+
+<p>The Sum value will be like this</p>
+
+<p><code>
+  [
+      [ &#39;4240142.9&#39;, &#39;1.108&#39;, &#39;1.108&#39;],// Best Bid [price, quantity, sum], sum = quantity for best bid <br/>
+      [ &#39;4240134.1&#39;, &#39;0.144&#39;, &#39;1.252&#39; ],// last_sum(1.108) + current_qty(0.144) <br/>
+      [ &#39;4240125.3&#39;, &#39;0.268&#39;, &#39;1.52&#39; ],// last_sum(1.252) + current_qty(0.268) <br/>
+      [ &#39;4240116.5&#39;, &#39;0.230&#39;, &#39;1.75&#39; ]
+  ]
+</code></p>
+
+<p><br/>
+2. Ask/Sell: For example these are the data sets for ask(sell)</p>
+
+<p><code>
+  [
+    [ &#39;4240353.6&#39;, &#39;17.892&#39; ],// Best Ask [price, quantity] <br/>
+    [ &#39;4240362.4&#39;, &#39;1.206&#39; ], <br/>
+    [ &#39;4240371.2&#39;, &#39;0.100&#39; ], <br/>
+    [ &#39;4240380&#39;, &#39;0.038&#39; ]
+  ]
+  </code></p>
+
+<p>The Sum value will be like this</p>
+
+<p><code>
+  [
+    [ &#39;4240353.6&#39;, &#39;17.892&#39;,  &#39;17.892&#39;],// Best Ask [price, quantity, sum], sum = quantity for best ask <br/><br>
+    [ &#39;4240362.4&#39;, &#39;1.206&#39;, &#39;19.098&#39;],// last_sum(17.892) + current_qty(1.206) <br/>
+    [ &#39;4240371.2&#39;, &#39;0.100&#39;, &#39;19.198&#39;],// last_sum(19.098) + current_qty(0.100) <br/>
+    [ &#39;4240380&#39;, &#39;0.038&#39;, &#39;19.236&#39;]
+  ]
+</code></p>
+<h2 id='all-contract-details'>All Contract Details</h2>
+<ul>
+<li>Listening Event Name: allContractDetails <br/></li>
+<li>Description: All contract details will provide the last price, market price price change percent and base asset volume for all the live contracts. No subscription required for this stream. <br/></li>
+<li>Update Speed: 1000ms</li>
+</ul>
+<h3 id='response-6'>Response</h3>
+<p>This JSON payload represents a summary of market data for different cryptocurrency trading pairs (e.g., XRPINR and MATICINR) against the Indian Rupee (INR). Here&#39;s a detailed breakdown of each field for the given symbols:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>XRPINR</td>
+<td></td>
+</tr>
+<tr>
+<td>lastPrice</td>
+<td>Last trade price (46.2545 INR)</td>
+</tr>
+<tr>
+<td>marketPrice</td>
+<td>Market price (46.2366455382 INR)</td>
+</tr>
+<tr>
+<td>priceChangePercent</td>
+<td>24-hour price change percentage (0.725%)</td>
+</tr>
+<tr>
+<td>baseAssetVolume</td>
+<td>24-hour total traded base asset volume (487166675.8 XRP)</td>
+</tr>
+<tr>
+<td>MATICINR</td>
+<td></td>
+</tr>
+<tr>
+<td>lastPrice</td>
+<td>Last trade price (74.9827 INR)</td>
+</tr>
+<tr>
+<td>marketPrice</td>
+<td>Market price (75.02073812399999 INR)</td>
+</tr>
+<tr>
+<td>priceChangePercent</td>
+<td>24-hour price change percentage (0.845%)</td>
+</tr>
+<tr>
+<td>baseAssetVolume</td>
+<td>24-hour total traded base asset volume (236293682 MATIC)</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>Sample response for All Contracts</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+  XRPINR: {
+    lastPrice: '46.2545', // last trade price
+    marketPrice: '46.2366455382', // market price
+    priceChangePercent: '0.725', // 24hr price change percent
+    baseAssetVolume: '487166675.8' // 24hr Total traded base asset volume
+  },
+  MATICINR: {
+    lastPrice: '74.9827',
+    marketPrice: '75.02073812399999',
+    priceChangePercent: '0.845',
+    baseAssetVolume: '236293682'
+  },
+  // plus other symbols data
+}
+</code></pre></div>
+<p>This payload provides a snapshot of key trading metrics for various cryptocurrency pairs, helping traders and analysts monitor market performance and make informed decisions.</p>
+<h2 id='market-info'>Market Info</h2>
+<ul>
+<li>Stream Name: <symbol>@marketInfo , eg: btcinr@marketInfo <br/></li>
+<li>Listening Event Name: marketInfo <br/></li>
+<li>Description: Market Info will provide the last price, market price price change percent and base asset volume for the provided symbol. <br/></li>
+<li>Update Speed: 1000ms</li>
+</ul>
+<h3 id='response-7'>Response</h3>
+<p>This JSON payload represents a summary of market data for the BTCINR trading pair. </p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>marketPrice</td>
+<td>The current market price (5938759 INR)</td>
+</tr>
+<tr>
+<td>lastPrice</td>
+<td>The last trade price (5938739 INR)</td>
+</tr>
+<tr>
+<td>priceChangePercent</td>
+<td>The percentage change in price over the last 24 hours (1.801%)</td>
+</tr>
+<tr>
+<td>baseAssetVolume</td>
+<td>The total volume of the base asset (BTC) traded in the last 24 hours (314315.223 BTC)</td>
+</tr>
+<tr>
+<td>symbol</td>
+<td>The trading pair (BTCINR)</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>Sample payload for Market Info</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>{
+    "marketPrice": "5938759",
+    "lastPrice": "5938739",
+    "priceChangePercent": "1.801",
+    "baseAssetVolume": "314315.223",
+    "symbol": "BTCINR"
+}
+</code></pre></div>
+<p>This payload provides key trading metrics for BTCINR, giving traders and analysts a snapshot of the current market conditions and recent trading activity.</p>
+<h2 id='mark-price-stream-for-all-markets'>Mark Price Stream for All Markets</h2>
+<ul>
+<li>Stream Name: markPriceArr <br/></li>
+<li>Listening Event Name: markPriceArr <br/></li>
+<li>Description: Mark price and funding rate for all symbols <br/></li>
+<li>Update Speed: 1000ms</li>
+</ul>
+<h3 id='response-8'>Response</h3>
+<p>This JSON array contains an object representing a <code>markPriceUpdate</code> event for the BTCINR trading pair. </p>
+
+<p>Here&#39;s a detailed breakdown of the fields within the object:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>BTCINR Mark Price Update</td>
+<td></td>
+</tr>
+<tr>
+<td>e</td>
+<td>Event type (markPriceUpdate indicates a mark price update event)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Event time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Symbol (the trading pair, BTCINR)</td>
+</tr>
+<tr>
+<td>p</td>
+<td>Market price (4334823.66859808 INR)</td>
+</tr>
+<tr>
+<td>P</td>
+<td>Estimated Settle Price (4335379.542328075 INR, only useful in the last hour before the settlement starts)</td>
+</tr>
+<tr>
+<td>i</td>
+<td>Index price (4336589.925536482 INR)</td>
+</tr>
+<tr>
+<td>r</td>
+<td>Funding rate (-0.0027)</td>
+</tr>
+<tr>
+<td>T</td>
+<td>Next funding time (timestamp in milliseconds)</td>
+</tr>
+</tbody></table>
+
+<p>Each object in the array represents a markPriceUpdate event for a different trading pair or market. </p>
+
+<p>The fields within each object provide important information about the current mark price, estimated settle price, index price, funding rate, and next funding time for the respective trading pair.</p>
+
+<blockquote>
+<p>Sample Response</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>[
+  {
+    e: 'markPriceUpdate',// Event type
+    E: 1707634490000,// Event time
+    s: 'BTCINR',// Symbol
+    p: '4334823.66859808',// Market price
+    P: '4335379.542328075',// Estimated Settle Price, only useful in the last hour before the settlement starts
+    i: '4336589.925536482',// Index price
+    r: '-0.0027',// Funding rate
+    T: 1707638400000// Next funding time
+  },
+  // Other markets data
+]
+</code></pre></div><h2 id='all-market-tickers-streams'>All Market Tickers Streams</h2>
+<ul>
+<li>Stream Name: tickerArr</li>
+<li>Listening Event Name: tickerArr</li>
+<li>Description: 24hr rolling window ticker statistics for all symbols. These are NOT the statistics of the UTC day, but a 24hr rolling window from requestTime to 24hrs before.</li>
+<li>Update Speed: 1000ms</li>
+</ul>
+<h3 id='response-9'>Response</h3>
+<p>The provided JSON structure represents a response from a stream named <code>tickerArr</code>, which gives 24-hour rolling window ticker statistics for all symbols. These statistics are updated every 1000 milliseconds and provide a comprehensive overview of the market conditions for each trading pair. </p>
+
+<p>Below is a detailed breakdown of each field within the response:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>e</td>
+<td>Event type (24hrTicker indicates a 24-hour ticker event)</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Event time (timestamp in milliseconds)</td>
+</tr>
+<tr>
+<td>s</td>
+<td>Symbol (the trading pair, e.g., BTCINR)</td>
+</tr>
+<tr>
+<td>p</td>
+<td>Price change (the absolute price change over the last 24 hours)</td>
+</tr>
+<tr>
+<td>P</td>
+<td>Price change percent (the percentage price change over the last 24 hours)</td>
+</tr>
+<tr>
+<td>w</td>
+<td>Weighted average price (the weighted average price over the last 24 hours)</td>
+</tr>
+<tr>
+<td>c</td>
+<td>Last price (the last traded price)</td>
+</tr>
+<tr>
+<td>Q</td>
+<td>Last quantity (the quantity of the last trade)</td>
+</tr>
+<tr>
+<td>o</td>
+<td>Open price (the price at the start of the 24-hour period)</td>
+</tr>
+<tr>
+<td>h</td>
+<td>High price (the highest price over the last 24 hours)</td>
+</tr>
+<tr>
+<td>l</td>
+<td>Low price (the lowest price over the last 24 hours)</td>
+</tr>
+<tr>
+<td>v</td>
+<td>Total traded base asset volume (the total volume of the base asset traded over the last 24 hours)</td>
+</tr>
+<tr>
+<td>q</td>
+<td>Total traded quote asset volume (the total volume of the quote asset traded over the last 24 hours)</td>
+</tr>
+<tr>
+<td>O</td>
+<td>Statistics open time (timestamp in milliseconds marking the start of the 24-hour period)</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Statistics close time (timestamp in milliseconds marking the end of the 24-hour period)</td>
+</tr>
+<tr>
+<td>F</td>
+<td>First trade ID (the trade ID of the first trade in the 24-hour period)</td>
+</tr>
+<tr>
+<td>L</td>
+<td>Last trade ID (the trade ID of the last trade in the 24-hour period)</td>
+</tr>
+<tr>
+<td>n</td>
+<td>Total number of trades (the total number of trades that occurred over the last 24 hours)</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>Sample</p>
+</blockquote>
+<div class="highlight"><pre class="highlight plaintext"><code>[
+  {
+    "e": "24hrTicker",                  // Event type
+    "E": 1707635719309,                 // Event time
+    "s": "BTCINR",                      // Symbol
+    "p": "87845.124",                   // Price change
+    "P": "2.116",                       // Price change percent
+    "w": "4188295.5225",                // Weighted average price
+    "c": "4239633.639",                 // Last price
+    "Q": "0.003",                       // Last quantity
+    "o": "4151788.515",                 // Open price
+    "h": "4267566",                     // High price
+    "l": "4112704.2840000005",          // Low price
+    "v": "222797.117",                  // Total traded base asset volume
+    "q": "10626810856.19",              // Total traded quote asset volume
+    "O": 1707549300000,                 // Statistics open time
+    "C": 1707635719307,                 // Statistics close time
+    "F": 4575372791,                    // First trade ID
+    "L": 4578191477,                    // Last trade ID
+    "n": 2818668                        // Total number of trades
+  },
+  // Other markets data
+]
+</code></pre></div>
+<ul>
+<li>This JSON array provides detailed 24-hour statistics for multiple trading pairs. <br/></li>
+<li>Each object in the array represents the ticker statistics for a specific trading pair (e.g., BTCINR). <br/></li>
+<li>The fields provide information about the price changes, trading volumes, and trade IDs over the past 24 hours. <br/></li>
+<li>This information is crucial for traders and analysts to monitor market performance and make informed trading decisions. </li>
+</ul>
