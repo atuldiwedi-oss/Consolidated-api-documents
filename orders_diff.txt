@@ -1,0 +1,171 @@
+diff --git a/source/pi42-api/orders/index.md.erb b/source/shark-api/orders/index.md.erb
+index 5aa0324..9d850ca 100644
+--- a/source/pi42-api/orders/index.md.erb
++++ b/source/shark-api/orders/index.md.erb
+@@ -1,4 +1,4 @@
+-<h1 id='orders'>Orders</h1>
++<h2 id='orders'>Orders</h2>
+ 
+ <h2 id="place-order">Place an Order </h2>
+ 
+@@ -9,7 +9,7 @@ def generate_signature(api_secret, data_to_sign):
+ 
+ `POST /v1/order/place-order`
+ 
+-Place an order (either a market order or a limit order) on Pi42's trading platform. It allows users to submit an order to buy or sell a specific asset.
++Place an order (either a market order or a limit order) on Shark's trading platform. It allows users to submit an order to buy or sell a specific asset.
+ <aside class="notice"> Note:
+ <ul>
+ <li>Price is compulsory to place a limit order.</li>
+@@ -488,6 +488,8 @@ The response parameters are described below:
+ </table>
+ 
+ 
++
++
+ <h2 id="split-tp-sl"> Split TP and SL </h2>
+ 
+ `POST /v2/order/split-tp-sl`
+@@ -534,7 +536,7 @@ def split_tp_sl():
+     sl_quantity_input = input("Enter the SL quantity: ")
+     sl_price_input = input("Enter the SL price: ")
+ 
+-    add_margin_url = "https://api.pi42.com/v2/order/split-tp-sl"
++    add_margin_url = "https://api.sharkexchange.in/v2/order/split-tp-sl"
+ 
+     try:
+         tp_quantity = int(tp_quantity_input)
+@@ -670,7 +672,6 @@ The response parameters are described below:
+ }
+ ```
+ 
+-
+ <h2 id="add-margin"> Add Margin </h2>
+ 
+ `POST /v1/order/add-margin`
+@@ -703,7 +704,7 @@ def add_margin():
+     position_id = input("Enter the positionId: ")
+     amount_input = input("Enter the amount: ")
+ 
+-    add_margin_url = "https://fapi.pi42.com/v1/order/add-margin"
++    add_margin_url = "https://api.sharkexchange.in/v1/order/add-margin"
+ 
+     try:
+         amount = int(amount_input)
+@@ -1181,7 +1182,7 @@ This endpoint is helpful for reviewing past orders and analyzing historical trad
+ # Function to fetch and display order history
+ def order_history():
+ timestamp = str(int(time.time() * 1000))
+-order_history_url = "https://fapi.pi42.com/v1/order/order-history"
++order_history_url = "https://api.sharkexchange.in/v1/order/order-history"
+ params = {
+ 'sortOrder': 'desc',
+ 'pageSize': 100,
+@@ -1297,7 +1298,7 @@ The details of the JSON object returned in the response body are as follows:
+     "lockedMarginInMarginAsset": 0,
+     "marginAsset": "INR",
+     "contractType": "PERPETUAL",
+-    "iconUrl": "https://storage.googleapis.com/pi42-dev-static/contract-icons/btc.png",
++    "iconUrl": "https://storage.googleapis.com/shark-dev-static/contract-icons/btc.png",
+     "quoteAsset": "INR",
+     "baseAsset": "BTC",
+     "leveragedQty": 0.002
+@@ -1395,7 +1396,7 @@ The details of the JSON object returned in the response body are as follows:
+     </tr>
+     <tr>
+       <td><strong>iconUrl</strong></td>
+-      <td>The URL of the contract icon (<a href="https://storage.googleapis.com/pi42-dev-static/contract-icons/btc.png" target="_blank">BTC Icon</a>).</td>
++      <td>The URL of the contract icon (<a href="https://storage.googleapis.com/shark-dev-static/contract-icons/btc.png" target="_blank">BTC Icon</a>).</td>
+     </tr>
+     <tr>
+       <td><strong>quoteAsset</strong></td>
+@@ -1424,7 +1425,7 @@ Retrieves orders that are linked by a specific link ID. It is used to fetch all
+ def linked_orders():
+ link_id = input("Enter the Link Id: ")
+ timestamp = str(int(time.time() * 1000))
+-linked_orders_url = "https://fapi.pi42.com/v1/order/linked-orders"
++linked_orders_url = "https://api.sharkexchange.in/v1/order/linked-orders"
+ 
+ url = f"{linked_orders_url}/{link_id}"
+ 
+@@ -1458,6 +1459,26 @@ async function linkedOrders(linkId) {
+ // Call the getRequest function (similar to postRequest)
+   return await getRequest(endpoint);
+ }
++
++// Fetch Margin History
++async function fetchMarginHistory() {
++ const endpoint = "/v1/order/fetch-margin-history";
++ const pageSize = 100;
++ const sortOrder = "desc";
++ const startTimestamp = "1696425435000";
++ const endTimestamp = "1725451568979";
++ const symbol = "BTCUSDT";
++
++// Prepare query parameters
++ const params = {
++
++// Optional Params
++ pageSize: pageSize.toString(),
++ sortOrder: sortOrder,
++ startTimestamp: startTimestamp,
++ endTimestamp: endTimestamp,
++ symbol: symbol,
++ };
+ ```
+ 
+ <table>
+@@ -1608,7 +1629,7 @@ Retrieves order details based on the reference ID.
+ def ref_order_details():
+ reference_id = input("Enter the reference Id: ")
+ timestamp = str(int(time.time() * 1000))
+-order_url = "https://fapi.pi42.com/v1/order/ref-id"
++order_url = "https://api.sharkexchange.in/v1/order/ref-id"
+ 
+ url = f"{order_url}/{reference_id}"
+ 
+@@ -1860,7 +1881,7 @@ It is used to fetch detailed information for a specific order, helping with orde
+ def order_details():
+ client_order_id = input("Enter the client order Id: ")
+ timestamp = str(int(time.time() * 1000))
+-order_url = "https://fapi.pi42.com/v1/order"
++order_url = "https://api.sharkexchange.in/v1/order"
+ 
+ url = f"{order_url}/{client_order_id}"
+ 
+@@ -2952,7 +2973,7 @@ async function getPosition() {
+         "quantity": 0.003,
+         "createdAt": "2024-09-13T08:19:18.642Z",
+         "contractType": "PERPETUAL",
+-        "iconUrl": "https://storage.googleapis.com/pi42-dev-static/contract-icons/btc.png",
++        "iconUrl": "https://storage.googleapis.com/shark-dev-static/contract-icons/btc.png",
+         "baseAsset": "BTC",
+         "quoteAsset": "USDT"
+     }
+@@ -3037,7 +3058,7 @@ async function getPosition() {
+     </tr>
+     <tr>
+       <td><strong>iconUrl</strong></td>
+-      <td>The URL for the contract icon (<code>https://storage.googleapis.com/pi42-dev-static/contract-icons/btc.png</code>).</td>
++      <td>The URL for the contract icon (<code>https://storage.googleapis.com/shark-dev-static/contract-icons/btc.png</code>).</td>
+     </tr>
+     <tr>
+       <td><strong>baseAsset</strong></td>
+@@ -3088,7 +3109,7 @@ const params = {
+ # Function to fetch trade history
+ def trade_history():
+     timestamp = str(int(time.time() * 1000))
+-    trade_history_url = "https://fapi.pi42.com/v1/user-data/trade-history"
++    trade_history_url = "https://api.sharkexchange.in/v1/user-data/trade-history"
+ 
+ params = {
+     sortOrder': 'desc',
+@@ -3800,7 +3821,7 @@ async function deleteOrder() {
+ ```python
+ def delete_order():
+     client_order_id = input("Enter the clientOrderId to delete: ")
+-    delete_order_url = "https://fapi.pi42.com/v1/order/delete-order"
++    delete_order_url = "https://api.sharkexchange.in/v1/order/delete-order"
+ 
+     timestamp = str(int(time.time() * 1000))
+ 
