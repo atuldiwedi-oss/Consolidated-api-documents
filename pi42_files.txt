@@ -1,0 +1,13 @@
+source/pi42-api/authentication/index.md.erb
+source/pi42-api/authentication/partner.md.erb
+source/pi42-api/changelog/index.md.erb
+source/pi42-api/errors.md.erb
+source/pi42-api/integration/index.md.erb
+source/pi42-api/introduction/index.md.erb
+source/pi42-api/orders/index_v1.md.erb
+source/pi42-api/orders/index.md.erb
+source/pi42-api/public-endpoints/index_v1.md.erb
+source/pi42-api/public-endpoints/index.md.erb
+source/pi42-api/rate-limits.md.erb
+source/pi42-api/websockets/index_v1.md.erb
+source/pi42-api/websockets/index.md.erb
