@@ -14,4 +14,5 @@
 
 <%= partial  "./niyam-api/websockets/index.md.erb" %>
 
-<%= partial  "./shared/errors.md.erb" %>
+<%= partial "./shared/errors.md.erb",
+    locals: { product_name: "Niyam" } %>

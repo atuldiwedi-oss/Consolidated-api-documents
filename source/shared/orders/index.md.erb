@@ -9,7 +9,7 @@ def generate_signature(api_secret, data_to_sign):
 
 `POST /v1/order/place-order`
 
-Place an order (either a market order or a limit order) on Pi42's trading platform. It allows users to submit an order to buy or sell a specific asset.
+Place an order (either a market order or a limit order) on <%= brand_config[:product_name] %>'s trading platform. It allows users to submit an order to buy or sell a specific asset.
 <aside class="notice"> Note:
 <ul>
 <li>Price is compulsory to place a limit order.</li>
@@ -534,7 +534,7 @@ def split_tp_sl():
     sl_quantity_input = input("Enter the SL quantity: ")
     sl_price_input = input("Enter the SL price: ")
 
-    add_margin_url = "https://api.pi42.com/v2/order/split-tp-sl"
+    add_margin_url = "<%= brand_config[:public_api] %>/v2/order/split-tp-sl"
 
     try:
         tp_quantity = int(tp_quantity_input)
@@ -703,7 +703,7 @@ def add_margin():
     position_id = input("Enter the positionId: ")
     amount_input = input("Enter the amount: ")
 
-    add_margin_url = "https://fapi.pi42.com/v1/order/add-margin"
+   add_margin_url = "<%= brand_config[:auth_api] %>/v1/order/add-margin"
 
     try:
         amount = int(amount_input)
@@ -1181,7 +1181,7 @@ This endpoint is helpful for reviewing past orders and analyzing historical trad
 # Function to fetch and display order history
 def order_history():
 timestamp = str(int(time.time() * 1000))
-order_history_url = "https://fapi.pi42.com/v1/order/order-history"
+order_history_url = "<%= brand_config[:auth_api] %>/v1/order/order-history"
 params = {
 'sortOrder': 'desc',
 'pageSize': 100,
@@ -1424,7 +1424,7 @@ Retrieves orders that are linked by a specific link ID. It is used to fetch all 
 def linked_orders():
 link_id = input("Enter the Link Id: ")
 timestamp = str(int(time.time() * 1000))
-linked_orders_url = "https://fapi.pi42.com/v1/order/linked-orders"
+linked_orders_url = "<%= brand_config[:auth_api] %>/v1/order/linked-orders"
 
 url = f"{linked_orders_url}/{link_id}"
 
@@ -1608,7 +1608,7 @@ Retrieves order details based on the reference ID.
 def ref_order_details():
 reference_id = input("Enter the reference Id: ")
 timestamp = str(int(time.time() * 1000))
-order_url = "https://fapi.pi42.com/v1/order/ref-id"
+order_url = "<%= brand_config[:auth_api] %>/v1/order/ref-id"
 
 url = f"{order_url}/{reference_id}"
 
@@ -1860,7 +1860,7 @@ It is used to fetch detailed information for a specific order, helping with orde
 def order_details():
 client_order_id = input("Enter the client order Id: ")
 timestamp = str(int(time.time() * 1000))
-order_url = "https://fapi.pi42.com/v1/order"
+order_url = "<%= brand_config[:auth_api] %>/v1/order"
 
 url = f"{order_url}/{client_order_id}"
 
@@ -3088,7 +3088,7 @@ const params = {
 # Function to fetch trade history
 def trade_history():
     timestamp = str(int(time.time() * 1000))
-    trade_history_url = "https://fapi.pi42.com/v1/user-data/trade-history"
+    trade_history_url = "<%= brand_config[:auth_api] %>/v1/user-data/trade-history"
 
 params = {
     sortOrder': 'desc',
@@ -3800,7 +3800,7 @@ async function deleteOrder() {
 ```python
 def delete_order():
     client_order_id = input("Enter the clientOrderId to delete: ")
-    delete_order_url = "https://fapi.pi42.com/v1/order/delete-order"
+    delete_order_url = "<%= brand_config[:auth_api] %>/v1/order/delete-order"
 
     timestamp = str(int(time.time() * 1000))
 

@@ -60,4 +60,45 @@ set :port, 4567
 
 helpers do
   require './lib/toc_data.rb'
+
+  def brand_config
+    case current_page.data.brand
+
+    when "pi42"
+      {
+        product_name: "Pi42",
+        public_api: "https://api.pi42.com",
+        auth_api: "https://fapi.pi42.com"
+      }
+
+    when "shark"
+      {
+        product_name: "Shark",
+        public_api: "https://api.sharkexchange.in",
+        auth_api: "https://api.sharkexchange.in"
+      }
+
+    when "cryptx"
+      {
+        product_name: "CryptX",
+        public_api: "https://api.cryptxindia.com",
+        auth_api: "https://api.cryptxindia.com"
+      }
+
+    when "niyam"
+      {
+        product_name: "Niyam",
+        public_api: "https://api.niyam.com",
+        auth_api: "https://fapi.niyam.com"
+      }
+
+    else
+      {
+        product_name: "Unknown",
+        public_api: "",
+        auth_api: ""
+      }
+    end
+  end
+
 end

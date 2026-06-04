@@ -12,4 +12,5 @@
 
 <%= partial  "./pi42-api/websockets/index.md.erb" %>
 
-<%= partial  "./shared/errors.md.erb" %>
+<%= partial "./shared/errors.md.erb",
+    locals: { product_name: "Pi42" } %>

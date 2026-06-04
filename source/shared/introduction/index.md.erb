@@ -1,12 +1,13 @@
+
 <h1 id='introduction'>Introduction</h1>
-<p>Pi42 offers a suite of public-facing APIs designed to facilitate integration with various applications and systems, particularly within the domains it specializes in. Here is a high-level introduction to the key features and functionalities of Pi42&#39;s public-facing APIs:</p>
+<p><%= product_name %> offers a suite of public-facing APIs designed to facilitate integration with various applications and systems, particularly within the domains it specializes in. Here is a high-level introduction to the key features and functionalities of <%= product_name %>'s public-facing APIs:</p>
 
 <ol>
 <li><p><strong>Authentication and Authorization</strong>:</p>
 
 <ul>
-<li><strong>OAuth 2.0 Support</strong>: Pi42 APIs utilize OAuth 2.0 for secure authentication and authorization, ensuring that only authorized users and applications can access the data.</li>
-<li><strong>API Keys</strong>: For simpler integrations, Pi42 also supports API keys, allowing developers to authenticate their requests with a unique key.</li>
+<li><strong>OAuth 2.0 Support</strong>: <%= product_name %>  APIs utilize OAuth 2.0 for secure authentication and authorization, ensuring that only authorized users and applications can access the data.</li>
+<li><strong>API Keys</strong>: For simpler integrations, <%= product_name %> also supports API keys, allowing developers to authenticate their requests with a unique key.</li>
 </ul></li>
 <br/>
 
@@ -14,7 +15,7 @@
 
 <ul>
 <li><strong>Data Retrieval</strong>: APIs provide endpoints for retrieving various types of data, such as user information, transaction history, and analytics reports.</li>
-<li><strong>Data Insertion and Updates</strong>: Developers can use the APIs to insert new data or update existing records in the Pi42 system.</li>
+<li><strong>Data Insertion and Updates</strong>: Developers can use the <%= product_name %>  to insert new data or update existing records in the <%= product_name %>system.</li>
 <li><strong>Search and Filtering</strong>: Advanced search and filtering capabilities allow developers to query the data efficiently, using parameters like date ranges, status filters, and more.</li>
 </ul></li>
 
@@ -38,13 +39,13 @@
 
 <ul>
 <li><strong>Data Encryption</strong>: All data transmitted via the APIs is encrypted to ensure security and privacy.</li>
-<li><strong>Compliance</strong>: Pi42 APIs adhere to industry standards and regulations, such as GDPR making them suitable for use in regulated industries like finance.</li>
+<li><strong>Compliance</strong>: <%= product_name %>  APIs adhere to industry standards and regulations, such as GDPR making them suitable for use in regulated industries like finance.</li>
 </ul></li>
 </ol>
 
-<h3 id='getting-started-with-pi42-apis'>Getting Started with Pi42 APIs</h3>
+<h3 id='getting-started-with-pi42-apis'>Getting Started with <%= product_name %>  APIs</h3>
 
-APIs provided by Pi42 classifications ensure that only authorized users can access sensitive functionalities, while still allowing open access to non-sensitive information or system statuses.
+APIs provided by <%= product_name %>  classifications ensure that only authorized users can access sensitive functionalities, while still allowing open access to non-sensitive information or system statuses.
 
 ### Authenticated APIs
 The Authenticated endpoints require users to provide valid credentials before access is granted. These endpoints are secured, ensuring that only authorized users can interact with sensitive data or perform privileged operations. Authentication typically involves the use of tokens, API keys, or OAuth, which must be included in the request header. These endpoints are designed for operations that involve personal data, secure transactions, or actions that could impact the system's state or other users.
@@ -78,11 +79,11 @@ Endpoints which **DO NOT** require `api-key` and `signature` authentication:
 
 <aside class="notice">
 Base URLs for: <br/>
-- Authenticated endpoints: <code>https://fapi.pi42.com/ </code> <br/>
-- Public endpoints: <code> https://api.pi42.com/ </code>
+- Authenticated endpoints: <code><%= brand_config[:auth_api] %>/</code> <br/>
+- Public endpoints: <code><%= brand_config[:public_api] %>/</code>
 </aside>
 
-To begin using Pi42 Authenticated APIs, follow these steps:
+To begin using <%= product_name %>  Authenticated APIs, follow these steps:
 
 1. API Key Creation <br/>
     Users can create an API key, which will be associated with a secret. The secret will be shown only once during the creation process.

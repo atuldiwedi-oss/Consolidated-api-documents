@@ -1,8 +1,13 @@
 # Shark APIs
 
+<%= partial "./shared/introduction/index.md.erb",
+    locals: { product_name: "Shark" } %>
+
+
+
 <%= partial "./shark-api/changelog/index.md.erb" %>
 
-<%= partial "./shark-api/introduction/index.md.erb" %>
+#<%= partial "./shark-api/introduction/index.md.erb" %>
 
 <%= partial "./shared/authentication/index.md.erb" %>
 
@@ -14,4 +19,5 @@
 
 <%= partial "./shark-api/websockets/index.md.erb" %>
 
-<%= partial "./shared/errors.md.erb" %>
+<%= partial "./shared/errors.md.erb",
+    locals: { product_name: "Shark" } %>
