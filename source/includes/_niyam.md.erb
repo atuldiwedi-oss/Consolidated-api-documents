@@ -2,7 +2,8 @@
 
 <%= partial  "./niyam-api/changelog/index.md.erb" %>
 
-<%= partial  "./niyam-api/introduction/index.md.erb" %>
+<%= partial "./shared/introduction/index.md.erb",
+    locals: { product_name: "Niyam" } %>
 
 <%= partial "./shared/authentication/index.md.erb" %>
 

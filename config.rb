@@ -100,5 +100,16 @@ helpers do
       }
     end
   end
+def product_name
+    brand_config[:product_name]
+  end
+
+  def public_api
+    brand_config[:public_api]
+  end
+
+  def auth_api
+    brand_config[:auth_api]
+  end
 
 end

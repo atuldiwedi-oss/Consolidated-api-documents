@@ -2,7 +2,8 @@
 
 <%= partial "./cryptx-api/changelog/index.md.erb" %>
 
-<%= partial "./cryptx-api/introduction/index.md.erb" %>
+<%= partial "./shared/introduction/index.md.erb",
+    locals: { product_name: "CryptX" } %>
 
 <%= partial "./shared/authentication/index.md.erb" %>
 
