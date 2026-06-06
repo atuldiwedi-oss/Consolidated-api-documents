@@ -47,7 +47,7 @@
 
 APIs provided by <%= product_name %>  classifications ensure that only authorized users can access sensitive functionalities, while still allowing open access to non-sensitive information or system statuses.
 
-### Authenticated APIs
+<strong>Authenticated APIs</strong>
 The Authenticated endpoints require users to provide valid credentials before access is granted. These endpoints are secured, ensuring that only authorized users can interact with sensitive data or perform privileged operations. Authentication typically involves the use of tokens, API keys, or OAuth, which must be included in the request header. These endpoints are designed for operations that involve personal data, secure transactions, or actions that could impact the system's state or other users.
 
 APIs that require trade permissions:
@@ -63,7 +63,7 @@ APIs that require trade permissions:
 
 </table>
 
-### Public APIs
+<strong>Public APIs</strong>
 The Public endpoints are accessible without any authentication, allowing open access to certain resources or information. These endpoints are designed to handle requests that do not require user identification or secure access, such as fetching general information, retrieving publicly available data, or providing status updates. While public, these endpoints are still subject to rate limiting and monitoring to prevent abuse or misuse of the system.
 
 Endpoints which **DO NOT** require `api-key` and `signature` authentication:
@@ -80,7 +80,7 @@ Endpoints which **DO NOT** require `api-key` and `signature` authentication:
 <aside class="notice">
 Base URLs for: <br/>
 - Authenticated endpoints: <code><%= current_page.data.brand %>/</code> <br/>
-- Public endpoints: <code><%= current_page.data.brand %>code>
+- Public endpoints: <code><%= current_page.data.brand %>/public</code>
 </aside>
 
 To begin using <%= product_name %>  Authenticated APIs, follow these steps:
@@ -160,7 +160,7 @@ async function getRequest(endpoint, params = {}) {
     }
 }
 ```
-### Response
+<strong>Response</strong>
 
 Returns: A Promise that resolves to the response data from the API.
 
@@ -214,7 +214,7 @@ async function postRequest(endpoint, params = {}) {
   }
 }
 ```
-### Response
+<strong>Response</strong>
 
 `console.log("Response:", response.data);` <br/>
 Logs the response data to the console. <br/>
@@ -224,7 +224,7 @@ Returns the response data for further use.<br/>
 
 
 
-<h3 id="patch-request">patchRequest Function<h3>
+<h3 id="patch-request">patchRequest Function</h3>
 
 The function sends PATCH requests to an API endpoint.
 
@@ -272,7 +272,7 @@ async function patchRequest(endpoint, params = {}) {
   }
 }
 ```
-### Response
+<strong>Response</strong>
 
 `console.log("Response:", response.data);` <br/>
 Logs the response data to the console. <br/>
@@ -327,7 +327,7 @@ async function putRequest(endpoint, params = {}) {
 }
 ```
 
-### Response
+<strong>Response</strong>
 If the request is successful, the response data is logged to the console and returned by the function.
 
 

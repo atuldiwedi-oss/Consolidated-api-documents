@@ -645,3 +645,24 @@ html, body {
 .copy-clipboard:hover {
   opacity: 0.8;
 }
+/* Brand specific colors */
+
+body.cryptx .toc-link.active,
+body.cryptx .tocify-item.active {
+  background: #ffbc06 !important;
+}
+
+body.pi42 .toc-link.active,
+body.pi42 .tocify-item.active {
+  background: #0F75D4 !important;
+}
+
+body.shark .toc-link.active,
+body.shark .tocify-item.active {
+  background: #16B5D8 !important;
+}
+
+body.niyam .toc-link.active,
+body.niyam .tocify-item.active {
+  background: #16B5D8 !important;
+}
