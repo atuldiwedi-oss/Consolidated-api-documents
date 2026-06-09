@@ -20,12 +20,18 @@ config =
       auth_api: "https://api.cryptxindia.com"
     }
   when "niyam"
-    {
-      product_name: "Niyam",
-      public_api: "https://api.niyam.com",
-      auth_api: "https://fapi.niyam.com"
-    }
-  end
+  {
+    product_name: "Niyam",
+    public_api: "https://api.niyam.com",
+    auth_api: "https://fapi.niyam.com"
+  }
+else
+  {
+    product_name: "Pi42",
+    public_api: "https://api.pi42.com",
+    auth_api: "https://fapi.pi42.com"
+  }
+end
 %>
 <h1 id='orders'>Orders</h1>
 

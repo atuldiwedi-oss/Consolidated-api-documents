@@ -20,12 +20,18 @@ config =
       auth_api: "https://api.cryptxindia.com"
     }
   when "niyam"
-    {
-      product_name: "Niyam",
-      public_api: "https://api.niyam.com",
-      auth_api: "https://fapi.niyam.com"
-    }
-  end
+  {
+    product_name: "Niyam",
+    public_api: "https://api.niyam.com",
+    auth_api: "https://fapi.niyam.com"
+  }
+else
+  {
+    product_name: "Pi42",
+    public_api: "https://api.pi42.com",
+    auth_api: "https://fapi.pi42.com"
+  }
+end
 %>
 <h1 id='public-endpoints'>Public Endpoints</h1>
 <p>Public endpoints in <%= config[:product_name] %> are designed to facilitate easy access to various functionalities of the <%= config[:product_name] %> platform, particularly for integration with external systems and applications. 

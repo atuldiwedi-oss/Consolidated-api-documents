@@ -77,10 +77,40 @@ Endpoints which **DO NOT** require `api-key` and `signature` authentication:
 </table>
 
 
+<%
+auth_url =
+  case current_page.data.brand
+  when "shark"
+    "https://api.sharkexchange.in/"
+  when "cryptx"
+    "https://fapi.cryptxindia.com/"
+  when "niyam"
+    "https://fapi.niyam.com/"
+  when "pi42"
+    "https://fapi.pi42.com/"
+    else
+    "https://fapi.pi42.com/"
+  end
+
+public_url =
+  case current_page.data.brand
+  when "shark"
+    "https://api.sharkexchange.in/"
+  when "cryptx"
+    "https://api.cryptxindia.com/"
+  when "niyam"
+    "https://api.niyam.com/"
+  when "pi42"
+    "https://api.pi42.com/"
+    else
+    "https://api.pi42.com/"
+  end
+%>
+
 <aside class="notice">
 Base URLs for: <br/>
-- Authenticated endpoints: <code><%= current_page.data.brand %>/</code> <br/>
-- Public endpoints: <code><%= current_page.data.brand %>/public</code>
+- Authenticated endpoints: <code><%= auth_url %></code> <br/>
+- Public endpoints: <code><%= public_url %></code>
 </aside>
 
 To begin using <%= product_name %>  Authenticated APIs, follow these steps:
