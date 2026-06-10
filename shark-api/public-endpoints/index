@@ -1,0 +1,843 @@
+<h1 id='public-endpoints'>Public Endpoints</h1>
+
+<p>Public endpoints in Shark are designed to facilitate easy access to various functionalities of the Shark platform, particularly for integration with external systems and applications. 
+
+Below is an overview of the public endpoints available in Shark, their typical uses, and example API calls.</p>
+
+<h2 id='ticker-update-24hr'>Ticker Update (24Hr)</h2>
+
+<p><code>GET /v1/market/ticker24Hr</code></p>
+
+<p>Fetches the 24-hour market ticker data for a specific trading pair. </p>
+
+<p>It provides details such as the last traded price, volume, and other market metrics over the past 24 hours.</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">fetchTicker</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/market/ticker24Hr/</span><span class="dl">"</span><span class="p">;</span>  <span class="c1">// API endpoint for fetching the 24-hour market ticker</span>
+    <span class="kd">const</span> <span class="nx">contractPair</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">BTCINR</span><span class="dl">"</span><span class="p">;</span>              <span class="c1">// The trading pair for which the ticker data is being requested</span>
+    <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">endpoint</span><span class="p">}${</span><span class="nx">contractPair</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>   <span class="c1">// Constructs the full URL by appending the trading pair to the endpoint</span>
+
+    <span class="c1">// Call the getRequest function with the constructed URL</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">getRequest</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">def</span> <span class="nf">get_24hr_ticker_update</span><span class="p">():</span>
+    <span class="c1"># Get the contract pair input from the user
+</span>    <span class="n">contract_pair</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Enter the contract pair (e.g., btc, eth): "</span><span class="p">).</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Validate the input
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">contract_pair</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Invalid contract pair. Please enter a valid contract pair (e.g., btc, eth)."</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Construct the full URL for the API request using the provided contract pair
+</span>    <span class="n">full_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"https://api.sharkexchange.in/v1/market/ticker24Hr/</span><span class="si">{</span><span class="n">contract_pair</span><span class="si">}</span><span class="s">"</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Send the GET request to the API
+</span>        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_url</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Raise an error for HTTP 4xx/5xx responses
+</span>
+        <span class="c1"># Parse the JSON response data
+</span>        <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="c1"># Print the 24-hour ticker update in a formatted manner
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'24-hour ticker update fetched successfully:'</span><span class="p">,</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="c1"># Handle HTTP errors specifically
+</span>        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Error: </span><span class="si">{</span><span class="n">err</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">text</span> <span class="k">if</span> <span class="n">err</span><span class="p">.</span><span class="n">response</span> <span class="k">else</span> <span class="n">err</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Handle any other unexpected errors
+</span>        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"An unexpected error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>contractPair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch the ticker data (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+<h3 id='response'>Response</h3>
+<p>The response parameters are as follows:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="err">//</span><span class="w"> </span><span class="err">Response</span><span class="w">
+</span><span class="p">{</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"24hrTicker"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1726313209122</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"139470.66"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"P"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.718"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"w"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5230573.12"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"c"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5271387.66"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.081"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"o"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5131917"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"h"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5344655.41"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5079790.8"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"v"</span><span class="p">:</span><span class="w"> </span><span class="s2">"274282.584"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"16265932028.08"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"O"</span><span class="p">:</span><span class="w"> </span><span class="mi">1726226760000</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"C"</span><span class="p">:</span><span class="w"> </span><span class="mi">1726313209120</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"F"</span><span class="p">:</span><span class="w"> </span><span class="mi">5380307688</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"L"</span><span class="p">:</span><span class="w"> </span><span class="mi">5383597456</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"n"</span><span class="p">:</span><span class="w"> </span><span class="mi">3289757</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>e</strong></td>
+      <td>The event type (<code>24hrTicker</code>), indicating a 24-hour ticker event.</td>
+    </tr>
+    <tr>
+      <td><strong>E</strong></td>
+      <td>The event time in milliseconds since epoch (<code>1726313209122</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>s</strong></td>
+      <td>The trading pair symbol (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>p</strong></td>
+      <td>The price change in the last 24 hours (<code>139470.66 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>P</strong></td>
+      <td>The percentage price change in the last 24 hours (<code>2.718%</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>w</strong></td>
+      <td>The weighted average price in the last 24 hours (<code>5230573.12 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>c</strong></td>
+      <td>The last price (<code>5271387.66 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Q</strong></td>
+      <td>The last quantity traded (<code>0.081 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>o</strong></td>
+      <td>The open price of the 24-hour period (<code>5131917 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>h</strong></td>
+      <td>The highest price in the last 24 hours (<code>5344655.41 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>l</strong></td>
+      <td>The lowest price in the last 24 hours (<code>5079790.8 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>v</strong></td>
+      <td>The total traded volume in the last 24 hours (<code>274282.584 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>q</strong></td>
+      <td>The total traded quote asset volume in the last 24 hours (<code>16265932028.08 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>O</strong></td>
+      <td>The start time of the 24-hour period in milliseconds since epoch (<code>1726226760000</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>C</strong></td>
+      <td>The end time of the 24-hour period in milliseconds since epoch (<code>1726313209120</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>F</strong></td>
+      <td>The first trade ID in the 24-hour period (<code>5380307688</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>L</strong></td>
+      <td>The last trade ID in the 24-hour period (<code>5383597456</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>n</strong></td>
+      <td>The number of trades in the 24-hour period (<code>3289757</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id='agg-trade-update'>Aggregate Trade Update</h2>
+
+<p><code>GET /v1/market/aggTrade</code></p>
+
+<p>Retrieves aggregated trade data for a specific trading pair. </p>
+
+<p>Aggregated trades provide summarized information about trade activities, such as total volume and price changes, for the given trading pair.</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">fetchAggTrade</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/market/aggTrade/</span><span class="dl">"</span><span class="p">;</span>   <span class="c1">// Define the API endpoint for aggregated trades</span>
+    <span class="kd">const</span> <span class="nx">contractPair</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">BTCINR</span><span class="dl">"</span><span class="p">;</span>             <span class="c1">// Specify the trading pair (e.g., Bitcoin to Indian Rupee)</span>
+    <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">endpoint</span><span class="p">}${</span><span class="nx">contractPair</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>  <span class="c1">// Construct the full URL by appending the trading pair to the endpoint</span>
+
+    <span class="c1">// Call the getRequest function to send the GET request to the API</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">getRequest</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="k">def</span> <span class="nf">get_trade_updates</span><span class="p">():</span>
+    <span class="c1"># Prompt the user to enter a contract pair
+</span>    <span class="n">contract_pair</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Enter the contract pair (e.g., btc, eth): "</span><span class="p">).</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Validate the user input
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">contract_pair</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Invalid contract pair. Please enter a valid contract pair (e.g., btc, eth)."</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Construct the URL for the API request using the provided contract pair
+</span>    <span class="n">full_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"https://api.sharkexchange.in/v1/market/aggTrade/</span><span class="si">{</span><span class="n">contract_pair</span><span class="si">}</span><span class="s">"</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Send the GET request to fetch trade updates
+</span>        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_url</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Raise an exception for HTTP error responses
+</span>
+        <span class="c1"># Parse the JSON response data
+</span>        <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="c1"># Print the trade updates in a formatted manner
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'Trade updates fetched successfully:'</span><span class="p">,</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="c1"># Handle HTTP errors specifically
+</span>        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Error: </span><span class="si">{</span><span class="n">err</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">text</span> <span class="k">if</span> <span class="n">err</span><span class="p">.</span><span class="n">response</span> <span class="k">else</span> <span class="n">err</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Handle any other unexpected errors
+</span>        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"An unexpected error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>contractPair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch aggregated trade data (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+<h3 id='response-2'>Response</h3>
+<p>The response body parameters are described as follows:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="err">//</span><span class="w"> </span><span class="err">Response</span><span class="w">
+</span><span class="p">{</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aggTrade"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1726313202969</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="mi">2329235556</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5271343.57"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.002"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"f"</span><span class="p">:</span><span class="w"> </span><span class="mi">5383597285</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="mi">5383597285</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1726313202966</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"m"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>e</strong></td>
+      <td>The event type (<code>aggTrade</code>), indicating an aggregated trade event.</td>
+    </tr>
+    <tr>
+      <td><strong>E</strong></td>
+      <td>The event time in milliseconds since epoch (<code>1726313202969</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>a</strong></td>
+      <td>The aggregate trade ID (<code>2329235556</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>s</strong></td>
+      <td>The trading pair symbol (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>p</strong></td>
+      <td>The price of the trade (<code>5271343.57 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>q</strong></td>
+      <td>The quantity of the trade (<code>0.002 BTC</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>f</strong></td>
+      <td>The first trade ID in the aggregate trade (<code>5383597285</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>l</strong></td>
+      <td>The last trade ID in the aggregate trade (<code>5383597285</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>T</strong></td>
+      <td>The trade time in milliseconds since epoch (<code>1726313202966</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>m</strong></td>
+      <td>Whether the buyer is the market maker (<code>true</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id='depth-update'>Depth Update</h2>
+
+<p><code>GET /v1/market/depth/</code></p>
+
+<p>Fetches the order book depth data for a specific trading pair. </p>
+
+<p>It provides information about the current market depth, including bid and ask prices and their respective volumes, which is essential for understanding market liquidity.</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">fetchDepth</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/market/depth/</span><span class="dl">"</span><span class="p">;</span>   <span class="c1">// API endpoint for fetching order book depth data</span>
+    <span class="kd">const</span> <span class="nx">contractPair</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">BTCINR</span><span class="dl">"</span><span class="p">;</span>           <span class="c1">// Trading pair for which the depth data is requested</span>
+    <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">endpoint</span><span class="p">}${</span><span class="nx">contractPair</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span> <span class="c1">// Constructs the full URL by appending the trading pair to the endpoint</span>
+
+    <span class="c1">// Call the getRequest function with the constructed URL</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">getRequest</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="k">def</span> <span class="nf">get_depth_update</span><span class="p">():</span>
+    <span class="c1"># Prompt the user to enter a contract pair
+</span>    <span class="n">contract_pair</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Enter the contract pair (e.g., btc, eth): "</span><span class="p">).</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="c1"># Validate the user input
+</span>    <span class="k">if</span> <span class="ow">not</span> <span class="n">contract_pair</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Invalid contract pair. Please enter a valid contract pair (e.g., btc, eth)."</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Construct the URL for the API request using the provided contract pair
+</span>    <span class="n">full_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"https://api.sharkexchange.in/v1/market/depth/</span><span class="si">{</span><span class="n">contract_pair</span><span class="si">}</span><span class="s">"</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Send the GET request to fetch depth updates
+</span>        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_url</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Raises an error for 4xx/5xx responses
+</span>
+        <span class="c1"># Parse the JSON response data
+</span>        <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="c1"># Print the depth update in a formatted manner
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'Depth update fetched successfully:'</span><span class="p">,</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="c1"># Handle HTTP errors specifically
+</span>        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Error: </span><span class="si">{</span><span class="n">err</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">text</span> <span class="k">if</span> <span class="n">err</span><span class="p">.</span><span class="n">response</span> <span class="k">else</span> <span class="n">err</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Handle any other unexpected errors
+</span>        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"An unexpected error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>contractPair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch the order book depth data (e.g., BTCINR)</td>
+        </tr>
+    </tbody>
+</table>
+<h3 id='response-3'>Response</h3>
+<p>The parameters contained in the response body are as follows:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="err">//</span><span class="w"> </span><span class="err">Response</span><span class="w">
+</span><span class="p">{</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"depthUpdate"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1726313210012</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1726313210009</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"U"</span><span class="p">:</span><span class="w"> </span><span class="mi">5339856484581</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"u"</span><span class="p">:</span><span class="w"> </span><span class="mi">5339856497601</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"pu"</span><span class="p">:</span><span class="w"> </span><span class="mi">5339856483867</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"b"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"5271043.69"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"0.554"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"5271396.49"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"0.866"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>e</strong></td>
+      <td>The event type (<code>depthUpdate</code>), indicating a market depth update.</td>
+    </tr>
+    <tr>
+      <td><strong>E</strong></td>
+      <td>The event time in milliseconds since epoch (<code>1726313210012</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>T</strong></td>
+      <td>The transaction time in milliseconds since epoch (<code>1726313210009</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>s</strong></td>
+      <td>The trading pair symbol (<code>BTCINR</code>), indicating Bitcoin (BTC) traded against Indian Rupee (INR).</td>
+    </tr>
+    <tr>
+      <td><strong>U</strong></td>
+      <td>The first update ID in the update (<code>5339856484581</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>u</strong></td>
+      <td>The last update ID in the update (<code>5339856497601</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>pu</strong></td>
+      <td>The previous update ID (<code>5339856483867</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>b</strong></td>
+      <td>Current bid prices and quantities. Each entry is an array where the first element is the price and the second element is the quantity. Example: <code>[["5271043.69", "0.554"]]</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>a</strong></td>
+      <td>Current ask prices and quantities. Each entry is an array where the first element is the price and the second element is the quantity. Example: <code>[["5271396.49", "0.866"]]</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id='klines'>Get Klines</h2>
+
+<p><code>POST /v1/market/klines</code></p>
+
+<p>Retrieves candlestick (kline) data for a specified trading pair and time interval. </p>
+
+<p>It provides historical price data that can be used for charting and analysis, including start and end times, and limits on the number of records returned.</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">getKlines</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/market/klines?priceType=MARK_PRICE</span><span class="dl">"</span><span class="p">;</span>
+
+    <span class="c1">// Define the fixed values for positionId and amount (though not used in this function)</span>
+    <span class="kd">const</span> <span class="nx">positionId</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">18c6c979-b089-4e67-b627-4c2072d0d5cb</span><span class="dl">"</span><span class="p">;</span> <span class="c1">// Replace with your actual position ID</span>
+    <span class="kd">const</span> <span class="nx">amount</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// Replace with the actual amount you want to add</span>
+
+    <span class="c1">// Prepare request payload</span>
+    <span class="kd">const</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="na">pair</span><span class="p">:</span> <span class="dl">"</span><span class="s2">BTCINR</span><span class="dl">"</span><span class="p">,</span>
+        <span class="na">interval</span><span class="p">:</span> <span class="dl">"</span><span class="s2">1m</span><span class="dl">"</span><span class="p">,</span>
+        <span class="c1">// Optional</span>
+        <span class="na">startTime</span><span class="p">:</span> <span class="mi">1696425435000</span><span class="p">,</span>
+        <span class="na">endTime</span><span class="p">:</span> <span class="mi">1696425435999</span><span class="p">,</span>
+        <span class="na">limit</span><span class="p">:</span> <span class="mi">1000</span>
+    <span class="p">};</span>
+
+    <span class="c1">// Call the postRequest function</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">postRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="nx">params</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="k">def</span> <span class="nf">get_kline_data</span><span class="p">():</span>
+  <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># User inputs
+</span>      <span class="n">pair</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Enter the trading pair (e.g., BTCINR): "</span><span class="p">).</span><span class="n">upper</span><span class="p">()</span>
+      <span class="n">interval</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"Enter the interval (e.g., 1m, 5m, 1h): "</span><span class="p">).</span><span class="n">lower</span><span class="p">()</span>
+
+      <span class="c1"># Prepare the request body (JSON)
+</span>      <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+          <span class="s">'pair'</span><span class="p">:</span> <span class="n">pair</span><span class="p">,</span>
+          <span class="s">'interval'</span><span class="p">:</span> <span class="n">interval</span><span class="p">,</span>
+          <span class="s">'limit'</span><span class="p">:</span> <span class="mi">1000</span>
+      <span class="p">}</span>
+
+      <span class="c1"># Headers for the POST request (no API key or signature required)
+</span>      <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+          <span class="s">'Content-Type'</span><span class="p">:</span> <span class="s">'application/json'</span>
+      <span class="p">}</span>
+
+      <span class="c1"># Construct the full URL for the Kline endpoint
+</span>      <span class="n">kline_url</span> <span class="o">=</span> <span class="s">"https://api.sharkexchange.in/v1/market/klines?priceType=MARK_PRICE"</span>
+
+      <span class="c1"># Send the POST request to get Kline data
+</span>      <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">kline_url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span> <span class="c1"># Raises an error for 4xx/5xx responses
+</span>      <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">'Kline data fetched successfully:'</span><span class="p">,</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+  <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">"Please enter valid inputs for pair, interval."</span><span class="p">)</span>
+  <span class="k">except</span> <span class="n">requests</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Error: </span><span class="si">{</span><span class="n">err</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">text</span> <span class="k">if</span> <span class="n">err</span><span class="p">.</span><span class="n">response</span> <span class="k">else</span> <span class="n">err</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+  <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"An unexpected error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>priceType</td>
+            <td>PriceType</td>
+            <td>No</td>
+            <td>The candle stick price type which to fetch (MARK_PRICE or LAST_PRICE)</td>
+        </tr>
+        <tr>
+            <td>pair</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The trading pair for which to fetch kline data (e.g., BTCINR)</td>
+        </tr>
+        <tr>
+            <td>interval</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The interval for each kline (e.g., "1m" for 1 minute, "5m" for 5 minutes)</td>
+        </tr>
+        <tr>
+            <td>startTime</td>
+            <td>number</td>
+            <td>No</td>
+            <td>The start time (in milliseconds) for the kline data (timestamp)</td>
+        </tr>
+        <tr>
+            <td>endTime</td>
+            <td>number</td>
+            <td>No</td>
+            <td>The end time (in milliseconds) for the kline data (timestamp)</td>
+        </tr>
+        <tr>
+            <td>limit</td>
+            <td>number</td>
+            <td>No</td>
+            <td>The maximum number of kline records to return</td>
+        </tr>
+    </tbody>
+</table>
+<h3 id='response-4'>Response</h3>
+<p>The response parameters are described below:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"startTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1726312200000"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"open"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5270382.19"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"high"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5270408.64"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"low"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5270382.19"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"close"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5270382.19"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"endTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1726312259999"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"volume"</span><span class="p">:</span><span class="w"> </span><span class="s2">"59.102"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>startTime</strong></td>
+      <td>The start time of the interval in milliseconds since epoch (<code>1726312200000</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>open</strong></td>
+      <td>The opening price of the interval (<code>5270382.19 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>high</strong></td>
+      <td>The highest price during the interval (<code>5270408.64 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>low</strong></td>
+      <td>The lowest price during the interval (<code>5270382.19 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>close</strong></td>
+      <td>The closing price of the interval (<code>5270382.19 INR</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>endTime</strong></td>
+      <td>The end time of the interval in milliseconds since epoch (<code>1726312259999</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>volume</strong></td>
+      <td>The trading volume during the interval (<code>59.102 BTC</code>).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id='exchange'>Exchange</h2>
+
+<p><code>GET /v1/exchange/exchangeInfo</code></p>
+
+<p>Retrieve exchange information</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">getExchangeInfo</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/exchange/exchangeInfo</span><span class="dl">"</span><span class="p">;</span>
+
+    <span class="c1">// Prepare request payload</span>
+    <span class="kd">const</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1">// Optional</span>
+        <span class="na">market</span><span class="p">:</span><span class="dl">"</span><span class="s2">INR</span><span class="dl">"</span>
+    <span class="p">};</span>
+
+    <span class="c1">// Call the postRequest function</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">getRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="nx">params</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code>
+<span class="k">def</span> <span class="nf">get_exchange_info</span><span class="p">():</span>
+
+  <span class="c1"># Construct the URL
+</span>  <span class="n">full_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s">/v1/exchange/exchangeInfo"</span>
+
+  <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># Send the GET request to fetch exchange information
+</span>      <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">full_url</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>  <span class="c1"># Raises an error for 4xx/5xx responses
+</span>      <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">'Exchange information fetched successfully:'</span><span class="p">,</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+  <span class="k">except</span> <span class="n">requests</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Error: </span><span class="si">{</span><span class="n">err</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">text</span> <span class="k">if</span> <span class="n">err</span><span class="p">.</span><span class="n">response</span> <span class="k">else</span> <span class="n">err</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+  <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"An unexpected error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>market</td>
+            <td>string</td>
+            <td>No</td>
+            <td>Will return exchangeInfo for market (e.g., INR/USDT)</td>
+        </tr>
+    </tbody>
+</table>
+<h3 id='response-5'>Response</h3>
+<p>The response parameters are described below:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>market</td>
+<td>A list of markets included in the response.</td>
+</tr>
+<tr>
+<td>contracts</td>
+<td>An array of contract objects that contain detailed information about specific trading contracts.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>The name of the trading pair (e.g., &quot;BTCINR&quot; for Bitcoin to INR)</td>
+</tr>
+<tr>
+<td>contractName</td>
+<td>The full name of the contract (e.g., &quot;Bitcoin&quot;).</td>
+</tr>
+<tr>
+<td>filters</td>
+<td>A list of filters that apply to the contract, detailing quantity and order constraints</td>
+</tr>
+<tr>
+<td>maxQty</td>
+<td>The maximum quantity allowed</td>
+</tr>
+<tr>
+<td>minQty</td>
+<td>The minimum quantity allowed</td>
+</tr>
+<tr>
+<td>filterType</td>
+<td>The type of filter (e.g., &quot;MARKET_QTY_SIZE&quot;, &quot;LIMIT_QTY_SIZE&quot;, &quot;MAX_NUM_ORDERS&quot;, &quot;MIN_NOTIONAL&quot;).</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>The maximum number of orders allowed.</td>
+</tr>
+<tr>
+<td>notional</td>
+<td>The minimum notional value.</td>
+</tr>
+<tr>
+<td>makerFee</td>
+<td>The fee percentage for makers.</td>
+</tr>
+<tr>
+<td>takerFee</td>
+<td>The fee percentage for takers.</td>
+</tr>
+<tr>
+<td>baseAsset</td>
+<td>The base asset for the contract (e.g., &quot;BTC&quot;).</td>
+</tr>
+<tr>
+<td>orderTypes</td>
+<td>The types of orders supported (e.g., &quot;LIMIT&quot;, &quot;MARKET&quot;).</td>
+</tr>
+<tr>
+<td>quoteAsset</td>
+<td>The quote asset for the contract (e.g., &quot;INR&quot;).</td>
+</tr>
+<tr>
+<td>maxLeverage</td>
+<td>The maximum leverage allowed (e.g., &quot;20&quot;).</td>
+</tr>
+<tr>
+<td>contractType</td>
+<td>The type of contract (e.g., &quot;PERPETUAL&quot;).</td>
+</tr>
+<tr>
+<td>marginBuffer</td>
+<td>The margin buffer value.</td>
+</tr>
+<tr>
+<td>depthGrouping</td>
+<td>The grouping for order book depth (e.g., [&quot;0.1&quot;]).</td>
+</tr>
+<tr>
+<td>liquidationFee</td>
+<td>The fee percentage for liquidation (e.g., &quot;0.020000&quot;).</td>
+</tr>
+<tr>
+<td>pricePrecision</td>
+<td>The number of decimal places for prices.</td>
+</tr>
+<tr>
+<td>isDefaultContract</td>
+<td>A boolean indicating if this is the default contract (e.g., true).</td>
+</tr>
+<tr>
+<td>quantityPrecision</td>
+<td>The number of decimal places for quantities.</td>
+</tr>
+<tr>
+<td>limitPriceVarAllowed</td>
+<td>The allowed price variation for limit orders (e.g., &quot;0.2&quot;).</td>
+</tr>
+<tr>
+<td>marginBufferPercentage</td>
+<td>The percentage for margin buffer (e.g., &quot;1&quot;).</td>
+</tr>
+<tr>
+<td>maintenanceMarginPercentage</td>
+<td>The percentage for maintenance margin (e.g., &quot;1&quot;).</td>
+</tr>
+<tr>
+<td>iconUrl</td>
+<td>The URL for the contract&#39;s icon (e.g., &quot;string&quot;).</td>
+</tr>
+<tr>
+<td>reduceMarginAllowedRatioPercent</td>
+<td>The allowed ratio percentage for reducing margin (e.g., 0.2).</td>
+</tr>
+<tr>
+<td>market</td>
+<td>The market identifier</td>
+</tr>
+<tr>
+<td>marginAssetsSupported</td>
+<td>A list of supported margin assets (e.g., [&quot;INR&quot;]).</td>
+</tr>
+<tr>
+<td>fundingFeeInterval</td>
+<td>The interval for funding fees (e.g., 8).</td>
+</tr>
+<tr>
+<td>tags</td>
+<td>A list of tags associated with the market or contracts (e.g., [&quot;MEME&quot;, &quot;DECENTRALIZED&quot;]).</td>
+</tr>
+<tr>
+<td>assetPrecisions</td>
+<td>An object that specifies the precision for assets.</td>
+</tr>
+<tr>
+<td>INR</td>
+<td>The precision for INR (e.g., 2 decimal places).</td>
+</tr>
+<tr>
+<td>USDT</td>
+<td>The precision for USDT (e.g., 4 decimal places).</td>
+</tr>
+<tr>
+<td>conversionRates</td>
+<td>An object that specifies conversion rates for margin and settlement.</td>
+</tr>
+<tr>
+<td>INR_MARGIN_USDT</td>
+<td>The conversion rate for INR margin to USDT (e.g., 88).</td>
+</tr>
+<tr>
+<td>INR_MARGIN_INR</td>
+<td>The conversion rate for INR margin to INR (e.g., 1)</td>
+</tr>
+<td>INR_SETTLEMENT_USDT</td>
+<td>The conversion rate for INR settlement to USDT (e.g., 88).</td>
+</tr>
+<tr>
+<td>INR_SETTLEMENT_INR</td>
+<td>The conversion rate for INR settlement to INR (e.g., 1)</td>
+</tr>
+<td>USDT_SETTLEMENT_USDT</td>
+<td>The conversion rate for USDT settlement to USDT (e.g., 1).</td>
+</tr>
+<tr>
+<td>USDT_MARGIN_USDT</td>
+<td>The conversion rate for USDT margin to USDT (e.g., 1)</td>
+</tr>
+</tbody></table>

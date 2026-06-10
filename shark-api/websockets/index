@@ -1,0 +1,783 @@
+<h1 id='web-sockets'>Web Sockets</h1>
+
+<p>WebSockets are used to provide real-time updates and maintain a continuous connection between clients (traders) and servers (exchanges).</p>
+
+<p>Here&#39;s how different web sockets work:</p>
+
+<h2 id="authenticated-web-sockets">Authenticated Web Sockets</h2>
+
+<p>Authenticated WebSockets require user validation to ensure that only authorized users can access the data or functionality provided such as receiving real-time updates about a trader&#39;s account.</p>
+
+<p>For example,  balance changes, order executions, or margin updates.</p>
+
+<aside class="notice"> Notes:
+<ul>
+  <li>Authenticated Web Socket stream base URL <code>https://fawss-uds.sharkexchange.in/auth-stream </code></li>
+  <li>Requires listenkey that can be obtained from the <a href="#create-listen-key">Create Listen Key API</a></li>
+</ul>
+</aside>
+
+<p>The WebSocket client connects to a server using a listen key and listens for various events related to trading activities and session management. Each event handler logs specific information when the event is received.</p>
+
+<p>Event listeners are described below:</p>
+
+<table>
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>connect</td>
+                <td>Triggered when the connection to the WebSocket server is open.</td>
+            </tr>
+            <tr>
+                <td>newPosition</td>
+                <td>Triggered when a new position is received from the server.</td>
+            </tr>
+            <tr>
+                <td>orderFilled</td>
+                <td>Triggered when an order is completely filled.</td>
+            </tr>
+            <tr>
+                <td>orderPartiallyFilled</td>
+                <td>Triggered when an order is partially filled.</td>
+            </tr>
+            <tr>
+                <td>orderCancelled</td>
+                <td>Triggered when an order is cancelled.</td>
+            </tr>
+            <tr>
+                <td>orderFailed</td>
+                <td>Triggered when an order fails.</td>
+            </tr>
+            <tr>
+                <td>newOrder</td>
+                <td>Triggered when a stop order is executed.</td>
+            </tr>
+            <tr>
+                <td>updateOrder</td>
+                <td>Triggered when a stop limit order is executed.</td>
+            </tr>
+            <tr>
+                <td>updatePosition</td>
+                <td>Triggered when a position is updated.</td>
+            </tr>
+            <tr>
+                <td>closePosition</td>
+                <td>Triggered when a position is closed.</td>
+            </tr>
+            <tr>
+                <td>balanceUpdate</td>
+                <td>Triggered when the balance is updated.</td>
+            </tr>
+            <tr>
+                <td>newTrade</td>
+                <td>Triggered when a new trade occurs.</td>
+            </tr>
+            <tr>
+                <td>sessionExpired</td>
+                <td>Triggered when the session expires.</td>
+            </tr>
+            <tr>
+                <td>disconnect</td>
+                <td>Triggered when the connection to the WebSocket server is closed.</td>
+            </tr>
+        </tbody>
+</table>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">const</span> <span class="nx">serverUrl</span> <span class="o">=</span> <span class="s2">`https://fawss-uds.sharkexchange.in/auth-stream/</span><span class="p">${</span><span class="nx">listenKey</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+
+<span class="c1">// Create a new socket connection</span>
+<span class="kd">const</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">(</span><span class="nx">serverUrl</span><span class="p">);</span>
+
+<span class="c1">// Event listener for when the connection is open</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">connect</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Connected to WebSocket server</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Event listener for messages from the server</span>
+
+<span class="c1">// Event listener for newPosition events</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">newPosition</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">New position received:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for order filled event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">orderFilled</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Order filled:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for order partially filled event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">orderPartiallyFilled</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Order partially filled:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for order cancelled event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">orderCancelled</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Order cancelled:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for order failed event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">orderFailed</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Order failed:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for new order event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">newOrder</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">New order:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for update position event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">updatePosition</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Position updated:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for close position event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">closePosition</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Position closed:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for balance update event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">balanceUpdate</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Balance updated:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for new trade event</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">newTrade</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">New trade:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Listen for session expiry</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">sessionExpired</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Session Expired:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Event listener for when the connection is closed</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">disconnect</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Disconnected from WebSocket server</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="c1"># Required installations:
+# python-socketio asyncio aiohttp
+</span>
+<span class="kn">import</span> <span class="nn">socketio</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+
+<span class="c1"># WebSocket server URL (without namespace)
+</span><span class="n">server_url</span> <span class="o">=</span> <span class="s">'Shark-Authenticated-websocket-url'</span>
+
+<span class="c1"># Namespace path for authorized streaming
+</span><span class="n">namespace_path</span> <span class="o">=</span> <span class="s">'/auth-stream/your-listen-key'</span>
+
+<span class="c1"># Create a new asynchronous Socket.IO client
+</span><span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="p">.</span><span class="n">AsyncClient</span><span class="p">()</span>
+
+<span class="c1"># Event listener for a successful connection to the server
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">event</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Successfully connected to the WebSocket server'</span><span class="p">)</span>
+
+<span class="c1"># Event listener for when the connection to the server is closed
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">event</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Disconnected from the WebSocket server'</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a new position update from the server
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'newPosition'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_new_position</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"New position received:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving an order filled notification
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'orderFilled'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_order_filled</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>  <span class="c1"># Accept data parameter
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">"Order filled:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a partially filled order update
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'orderPartiallyFilled'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_order_partially_filled</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Order partially filled:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a cancelled order notification
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'orderCancelled'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_order_cancelled</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Order cancelled:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a failed order notification
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'orderFailed'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_order_failed</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Order failed:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a new order(TP/SL) notification
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'newOrder'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_new_order</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"New order:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a position update
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'updatePosition'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_update_position</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Position updated:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a position close notification
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'closePosition'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_close_position</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Position closed:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for balance update notifications
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'balanceUpdate'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_balance_update</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Balance updated:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for receiving a new trade notification
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'newTrade'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_new_trade</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"New trade:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event handler for session expiration notifications
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'sessionExpired'</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace_path</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">on_session_expired</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Session expired:"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event listener for connection errors
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">event</span>
+<span class="k">async</span> <span class="k">def</span> <span class="nf">connect_error</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Failed to connect to the WebSocket server:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Main function to initiate and maintain the WebSocket connection
+</span><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Attempt to connect to the server with specified transports
+</span>        <span class="k">await</span> <span class="n">sio</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">server_url</span><span class="p">,</span> <span class="n">transports</span><span class="o">=</span><span class="p">[</span><span class="s">"websocket"</span><span class="p">])</span>
+        <span class="k">await</span> <span class="n">sio</span><span class="p">.</span><span class="n">wait</span><span class="p">()</span>  <span class="c1"># Keeps the connection open to listen for events
+</span>    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Connection error:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="c1"># Entry point for the asyncio program
+# Uses asyncio.run() to execute the main coroutine
+</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+<h2 id="public-web-sockets">Public Web Sockets</h2>
+
+<p>Public WebSockets are open to all clients and do not require authentication to establish a connection. They are useful for scenarios where the data being transmitted is not sensitive or where the application does not require user-specific interactions.</p>
+
+<p>For example, to receive real-time updates on market data such as price changes, order book depth, and trade history without requiring authentication.</p>
+
+<aside class="notice">
+
+  Public Web Socket URL <code>https://fawss.sharkexchange.in/</code>
+
+</aside>
+
+<p>Once connected, users can subscribe to different topics mentioned below:</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Example</th>
+            <th>Listening Topic</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>contract_pair@depth_minGrouping</td>
+            <td>btcinr@depth
+            _
+            0.1</td>
+            <td>depthUpdate</td>
+        </tr>
+        <tr>
+            <td>contract
+            _pair@kline
+            _
+            interval</td>
+            <td>btcinr@kline
+            _
+            1m</td>
+            <td>kline</td>
+        </tr>
+        <tr>
+            <td>contract
+            _pair@markPrice</td>
+            <td>btcinr@markPrice</td>
+            <td>markPriceUpdate</td>
+        </tr>
+        <tr>
+            <td>contract
+            _pair@aggTrade</td>
+            <td>btcinr@aggTrade</td>
+            <td>aggTrade</td>
+        </tr>
+        <tr>
+            <td>contract
+            _pair@ticker</td>
+            <td>btcinr@ticker</td>
+            <td>24hrTicker</td>
+        </tr>
+        <tr>
+            <td>contract
+            _pair@marketInfo</td>
+            <td>btcinr@marketInfo</td>
+            <td>marketInfo</td>
+        </tr>
+        <tr>
+            <td>markPriceArr</td>
+            <td>N/A</td>
+            <td>markPriceArr</td>
+        </tr>
+        <tr>
+            <td>tickerArr</td>
+            <td>N/A</td>
+            <td>tickerArr</td>
+        </tr>
+        <tr>
+            <td>All contracts details</td>
+            <td>N/A</td>
+            <td>allContractDetails</td>
+        </tr>
+</table>
+
+<ul>
+<li>Intervals: The intervals for kline (candlestick) data can be <code>1m</code>, <code>3m</code>, <code>5m</code>, <code>15m</code>, <code>30m</code>, <code>1h</code>, <code>2h</code>, <code>4h</code>, <code>6h</code>, <code>8h</code>, <code>12h</code>, <code>1d</code>, <code>3d</code>, <code>1w</code>, <code>1M</code>.</li>
+<li>MinGroupings: Depth groupings vary by contract. For example, 0.1 is used for BTC.</li>
+<li>Get <code>depthGrouping</code> value of each contract from
+<a href="#exchange">Exchange Info API</a></li>
+</ul>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">io</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">socket.io-client</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="c1">// WebSocket server URL</span>
+<span class="kd">const</span> <span class="nx">serverUrl</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">https://fawss.sharkexchange.in/</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="c1">// Create a new socket connection</span>
+<span class="kd">const</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">(</span><span class="nx">serverUrl</span><span class="p">);</span>
+
+<span class="c1">// Event listener for when the connection is open</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">connect</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Connected to WebSocket server</span><span class="dl">'</span><span class="p">);</span>
+  <span class="nx">subscribeToTopics</span><span class="p">();</span>
+<span class="p">});</span>
+
+<span class="c1">// Event listener for when the connection is closed</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">disconnect</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Disconnected from WebSocket server</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Event listener for errors</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">error</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">error</span><span class="p">:</span> <span class="nx">any</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Socket.IO error:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="c1">// Function to subscribe to various WebSocket topics</span>
+<span class="kd">function</span> <span class="nx">subscribeToTopics</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">topics</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">btcinr@depth_0.1</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">btcinr@markPrice</span><span class="dl">'</span><span class="p">];</span> <span class="c1">// List of topics you want to subscribe to</span>
+
+  <span class="c1">// Subscribe to each topic</span>
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="dl">'</span><span class="s1">subscribe</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">params</span><span class="p">:</span> <span class="nx">topics</span><span class="p">,</span> <span class="c1">// Sends the topics array to the WebSocket server</span>
+  <span class="p">});</span>
+
+  <span class="c1">// Event listener for updates on various data topics</span>
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">depthUpdate</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">depthUpdate: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">kline</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">kline: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">markPriceUpdate</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">markPriceUpdate: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">aggTrade</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">aggTrade: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">24hrTicker</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">24hrTicker: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">marketInfo</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">marketInfo: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">markPriceArr</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">markPriceArr: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">tickerArr</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">tickerArr: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">marginRate</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">marginRate: </span><span class="dl">'</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="c1"># Required installations:
+# pip install python-socketio
+</span>
+<span class="kn">import</span> <span class="nn">socketio</span>
+
+<span class="c1"># WebSocket server URL
+</span><span class="n">server_url</span> <span class="o">=</span> <span class="s">'https://fawss.sharkexchange.in/'</span>
+
+<span class="c1"># Create a new Socket.IO client
+</span><span class="n">sio</span> <span class="o">=</span> <span class="n">socketio</span><span class="p">.</span><span class="n">Client</span><span class="p">()</span>
+
+<span class="c1"># Event listener for when the connection is open
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">event</span>
+<span class="k">def</span> <span class="nf">connect</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Connected to WebSocket server'</span><span class="p">)</span>
+    <span class="n">subscribe_to_topics</span><span class="p">()</span>
+
+<span class="c1"># Event listener for when the connection is closed
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">event</span>
+<span class="k">def</span> <span class="nf">disconnect</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Disconnected from WebSocket server'</span><span class="p">)</span>
+
+<span class="c1"># Event listener for errors
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">event</span>
+<span class="k">def</span> <span class="nf">connect_error</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Socket.IO connection error:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Event listener for general errors
+</span><span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'error'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">handle_error</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Socket.IO error:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Function to subscribe to various WebSocket topics
+</span><span class="k">def</span> <span class="nf">subscribe_to_topics</span><span class="p">():</span>
+    <span class="n">topics</span> <span class="o">=</span> <span class="p">[</span><span class="s">'btcinr@depth_0.1'</span><span class="p">,</span> <span class="s">'btcinr@markPrice'</span><span class="p">]</span>  <span class="c1"># List of topics to subscribe to
+</span>
+    <span class="c1"># Subscribe to each topic
+</span>    <span class="n">sio</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s">'subscribe'</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s">'params'</span><span class="p">:</span> <span class="n">topics</span>  <span class="c1"># Sends the topics array to the WebSocket server
+</span>    <span class="p">})</span>
+
+    <span class="c1"># Event listeners for updates on various data topics
+</span>    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'depthUpdate'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_depth_update</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'depthUpdate:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'kline'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_kline</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'kline:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'markPriceUpdate'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_mark_price_update</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'markPriceUpdate:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'aggTrade'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_agg_trade</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'aggTrade:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'24hrTicker'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_24hr_ticker</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'24hrTicker:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'marketInfo'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_market_info</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'marketInfo:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'markPriceArr'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_mark_price_arr</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'markPriceArr:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'tickerArr'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_ticker_arr</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'tickerArr:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+    <span class="o">@</span><span class="n">sio</span><span class="p">.</span><span class="n">on</span><span class="p">(</span><span class="s">'marginRate'</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_margin_rate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'marginRate:'</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Connect to the WebSocket server
+</span><span class="n">sio</span><span class="p">.</span><span class="n">connect</span><span class="p">(</span><span class="n">server_url</span><span class="p">)</span>
+
+<span class="c1"># Keep the connection open
+</span><span class="n">sio</span><span class="p">.</span><span class="n">wait</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="create-listen-key"> Create Listen Key </h2>
+
+<p><code>POST /v1/retail/listen-key</code></p>
+
+<p>Creates a new listen key for WebSocket connections.</p>
+
+<p>A listen key is used to maintain a persistent connection to the WebSocket server, allowing you to receive real-time updates on user account data.</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">const</span> <span class="nx">baseUrl</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SHARK_BASE_URL</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">/v1/retail/listen-key</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="c1">// Function to generate a signature for the request</span>
+<span class="kd">const</span> <span class="nx">generateSignature</span> <span class="o">=</span> <span class="p">(</span><span class="nx">params</span><span class="p">:</span> <span class="nx">object</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">crypto</span>
+    <span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="dl">'</span><span class="s1">sha256</span><span class="dl">'</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">params</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="dl">'</span><span class="s1">hex</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="c1">// Function to call Create Listen Key API</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">createListenKey</span><span class="p">(</span><span class="nx">apiKey</span><span class="p">:</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">:</span> <span class="nx">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">timestamp</span><span class="p">:</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">(),</span>
+  <span class="p">};</span>
+
+  <span class="kd">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">generateSignature</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">);</span>
+
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">axios</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="nx">baseUrl</span><span class="p">,</span> <span class="nx">params</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">'</span><span class="s1">api-key</span><span class="dl">'</span><span class="p">:</span> <span class="nx">apiKey</span><span class="p">,</span>
+        <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+        <span class="dl">'</span><span class="s1">signature</span><span class="dl">'</span><span class="p">:</span> <span class="nx">signature</span><span class="p">,</span>
+      <span class="p">},</span>
+    <span class="p">});</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Create Listen Key Response:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">listenKey</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span>
+      <span class="dl">'</span><span class="s1">Error creating Listen Key:</span><span class="dl">'</span><span class="p">,</span>
+      <span class="nx">error</span><span class="p">.</span><span class="nx">response</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span> <span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span>
+    <span class="p">);</span>
+    <span class="k">throw</span> <span class="nx">error</span><span class="p">;</span> <span class="c1">// Rethrow the error for further handling</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>timestamp</td>
+            <td>string</td>
+            <td>Yes</td>
+            <td>The current timestamp in milliseconds to ensure request uniqueness and prevent replay attacks</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>The <code>createListenKey</code> function also requires an <code>apiKey</code> and <code>apiSecret</code> for authentication, and these are included in the headers of the request:</p>
+
+<ul>
+<li><code>apiKey</code>: The API key for authenticating the request.</li>
+<li><code>apiSecret</code>: The API secret used to generate the signature for request validation.</li>
+</ul>
+
+<p>The function generates a signature using HMAC SHA-256 encryption of the request parameters and sends a POST request to the API endpoint to create a new listen key. If successful, it logs and returns the listen key; otherwise, it logs and throws the error for further handling.</p>
+<h3 id='reponse'>Reponse</h3>
+<p>The response parameters are described below:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="err">//</span><span class="w"> </span><span class="err">Response</span><span class="w">
+
+</span><span class="p">{</span><span class="w">
+  </span><span class="nl">"listenKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"c44ec0b16e1e79d82473283a9736d2d037f105c39190ad48539fd6479a5b8ecc"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>listenKey</strong></td>
+      <td>The unique identifier for the Listen Key, used to maintain a persistent connection for real-time data streams. Example: <code>c44ec0b16e1e79d82473283a9736d2d037f105c39190ad48539fd6479a5b8ecc</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="get-listen-key">Get Listen Key</h2>
+
+<p><code>POST /v1/retail/listen-key</code></p>
+
+<p>Retrieves a new listen key for WebSocket connections.</p>
+
+<p>A listen key is used to maintain a persistent WebSocket connection, allowing you to receive real-time updates.</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">getListenKey</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/retail/listen-key</span><span class="dl">"</span><span class="p">;</span>
+
+    <span class="c1">// Call the postRequest function</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">postRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="p">{});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="k">def</span> <span class="nf">create_or_update_listen_key</span><span class="p">():</span>
+  <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+
+  <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">'timestamp'</span><span class="p">:</span> <span class="n">timestamp</span>
+  <span class="p">}</span>
+
+  <span class="c1"># Convert the parameters to a query string (if signing a query string)
+</span>  <span class="n">data_to_sign</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s">','</span><span class="p">,</span> <span class="s">':'</span><span class="p">))</span>
+  <span class="n">signature</span> <span class="o">=</span> <span class="n">generate_signature</span><span class="p">(</span><span class="n">api_secret</span><span class="p">,</span> <span class="n">data_to_sign</span><span class="p">)</span>
+
+  <span class="c1"># Headers for the request
+</span>  <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">'api-key'</span><span class="p">:</span> <span class="n">api_key</span><span class="p">,</span>
+      <span class="s">'Content-Type'</span><span class="p">:</span> <span class="s">'application/json'</span><span class="p">,</span>
+      <span class="s">'signature'</span><span class="p">:</span> <span class="n">signature</span><span class="p">,</span>
+  <span class="p">}</span>
+
+  <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># Send the POST request to create or update a listen key
+</span>      <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">listen_key_url</span><span class="si">}</span><span class="s">'</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+      <span class="n">response_data</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">'Listen key created or updated successfully:'</span><span class="p">,</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+  <span class="k">except</span> <span class="n">requests</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Failed </span><span class="si">{</span><span class="n">response</span><span class="p">.</span><span class="n">status_code</span><span class="si">}</span><span class="s">: </span><span class="si">{</span><span class="n">response</span><span class="p">.</span><span class="n">text</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>None</td>
+            <td>N/A</td>
+            <td>No</td>
+            <td>Retrieves a new listen key for WebSocket connections. <br/>A listen key is used to maintain a persistent WebSocket connection, allowing you to receive real-time updates.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 id="update-listen-key">Update Listen Key</h2>
+
+<p><code>PUT /v1/retail/listen-key</code></p>
+
+<p>Updates the listen key for WebSocket connections.</p>
+
+<p>Updating the listen key at least once per hour is necessary to maintain an active WebSocket connection and prevent disconnections due to inactivity.</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>None</td>
+            <td>N/A</td>
+            <td>No</td>
+            <td>Updates the listen key for WebSocket connections. </td>
+        </tr>
+    </tbody>
+</table>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">updateListenKey</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/retail/listen-key</span><span class="dl">"</span><span class="p">;</span>
+
+    <span class="c1">// Call the getRequest function</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">putRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="p">{});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="k">def</span> <span class="nf">update_listen_key_expiry</span><span class="p">():</span>
+  <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+
+  <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">'timestamp'</span><span class="p">:</span> <span class="n">timestamp</span>
+  <span class="p">}</span>
+
+  <span class="n">data_to_sign</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s">','</span><span class="p">,</span> <span class="s">':'</span><span class="p">))</span>
+
+  <span class="c1"># Generate the signature using the provided helper function
+</span>  <span class="n">signature</span> <span class="o">=</span> <span class="n">generate_signature</span><span class="p">(</span><span class="n">api_secret</span><span class="p">,</span> <span class="n">data_to_sign</span><span class="p">)</span>
+
+  <span class="c1"># Headers for the PUT request
+</span>  <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">'api-key'</span><span class="p">:</span> <span class="n">api_key</span><span class="p">,</span>
+      <span class="s">'signature'</span><span class="p">:</span> <span class="n">signature</span><span class="p">,</span>
+  <span class="p">}</span>
+
+  <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># Send the PUT request to update the listen key expiry
+</span>      <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="n">listen_key_url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+      <span class="k">print</span><span class="p">(</span><span class="s">'Listen key expiry updated successfully:'</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+  <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Failed </span><span class="si">{</span><span class="n">response</span><span class="p">.</span><span class="n">status_code</span><span class="si">}</span><span class="s">: </span><span class="si">{</span><span class="n">response</span><span class="p">.</span><span class="n">text</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div><h3 id='response'>Response</h3>
+<p>The response contains a message as shown:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="err">//</span><span class="w"> </span><span class="err">Response</span><span class="w">
+   </span><span class="err">Listen</span><span class="w"> </span><span class="err">Key</span><span class="w"> </span><span class="err">expiry</span><span class="w"> </span><span class="err">time</span><span class="w"> </span><span class="err">updated</span><span class="w"> </span><span class="err">successfully.</span><span class="w">
+
+</span></code></pre></div>
+<h2 id="delete-listen-key">Delete Listen Key</h2>
+
+<p><code>DELETE /v1/retail/listen-key</code></p>
+
+<p>Deletes the listen key for WebSocket connections.</p>
+
+<p>This action terminates the connection and stops the receipt of real-time updates.</p>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">deleteListenKey</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">endpoint</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">/v1/retail/listen-key</span><span class="dl">"</span><span class="p">;</span>
+
+    <span class="c1">// Call the deleteRequest function</span>
+    <span class="k">return</span> <span class="k">await</span> <span class="nx">deleteRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="p">{});</span>
+<span class="p">}</span>
+</code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="k">def</span> <span class="nf">delete_listen_key</span><span class="p">():</span>
+  <span class="c1"># Generate the current timestamp
+</span>  <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+
+  <span class="c1"># Prepare the data for the request (listenKey is passed in the URL path)
+</span>  <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">'timestamp'</span><span class="p">:</span> <span class="n">timestamp</span>
+  <span class="p">}</span>
+
+  <span class="c1"># Generate the signature based on the params
+</span>  <span class="n">data_to_sign</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s">','</span><span class="p">,</span> <span class="s">':'</span><span class="p">))</span>
+  <span class="n">signature</span> <span class="o">=</span> <span class="n">generate_signature</span><span class="p">(</span><span class="n">api_secret</span><span class="p">,</span> <span class="n">data_to_sign</span><span class="p">)</span>
+
+  <span class="c1"># Headers for the DELETE request
+</span>  <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">'api-key'</span><span class="p">:</span> <span class="n">api_key</span><span class="p">,</span>
+      <span class="s">'signature'</span><span class="p">:</span> <span class="n">signature</span><span class="p">,</span>
+      <span class="s">'accept'</span><span class="p">:</span> <span class="s">'*/*'</span>
+  <span class="p">}</span>
+
+  <span class="c1"># Construct the full URL, inserting the listenKey into the path
+</span>  <span class="n">delete_listen_key_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s">/v1/retail/listen-key/"</span>
+
+  <span class="k">try</span><span class="p">:</span>
+      <span class="c1"># Send the DELETE request to delete the listen key
+</span>      <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">delete</span><span class="p">(</span><span class="n">delete_listen_key_url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+      <span class="n">response</span><span class="p">.</span><span class="n">raise_for_status</span><span class="p">()</span> <span class="c1"># Raises an error for 4xx/5xx responses
+</span>      <span class="k">print</span><span class="p">(</span><span class="s">'Listen key deleted successfully.'</span><span class="p">)</span>
+  <span class="k">except</span> <span class="n">requests</span><span class="p">.</span><span class="n">exceptions</span><span class="p">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"Error: </span><span class="si">{</span><span class="n">err</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">text</span> <span class="k">if</span> <span class="n">err</span><span class="p">.</span><span class="n">response</span> <span class="k">else</span> <span class="n">err</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+  <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"An unexpected error occurred: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div>
+<table>
+    <thead>
+        <tr>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>None</td>
+            <td>N/A</td>
+            <td>No</td>
+            <td>Deletes the listen key for WebSocket connections</td>
+        </tr>
+    </tbody>
+</table>
+<h3 id='response-2'>Response</h3>
+<p>The response body contains the message as shown in the snippet:</p>
+<div class="highlight"><pre class="highlight plaintext"><code>Listen key deleted successfully.
+</code></pre></div>

@@ -1,0 +1,365 @@
+<h1 id='introduction'>Introduction</h1>
+
+<p>Niyam offers a suite of public-facing APIs designed to facilitate integration with various applications and systems, particularly within the domains it specializes in. Here is a high-level introduction to the key features and functionalities of Niyam&#39;s public-facing APIs:</p>
+
+<ol>
+<li><p><strong>Authentication and Authorization</strong>:</p>
+
+<ul>
+<li><strong>OAuth 2.0 Support</strong>: Niyam APIs utilize OAuth 2.0 for secure authentication and authorization, ensuring that only authorized users and applications can access the data.</li>
+<li><strong>API Keys</strong>: For simpler integrations, Niyam also supports API keys, allowing developers to authenticate their requests with a unique key.</li>
+</ul></li>
+<br/>
+
+<li><p><strong>Data Access and Management</strong>:</p>
+
+<ul>
+<li><strong>Data Retrieval</strong>: APIs provide endpoints for retrieving various types of data, such as user information, transaction history, and analytics reports.</li>
+<li><strong>Data Insertion and Updates</strong>: Developers can use the APIs to insert new data or update existing records in the Niyam system.</li>
+<li><strong>Search and Filtering</strong>: Advanced search and filtering capabilities allow developers to query the data efficiently, using parameters like date ranges, status filters, and more.</li>
+</ul></li>
+
+<br/>
+<li><p><strong>Analytics and Reporting</strong>:</p>
+
+<ul>
+<li><strong>Real-time Analytics</strong>: Access real-time analytics data, enabling applications to display up-to-the-minute information.</li>
+<li><strong>Custom Reports</strong>: APIs allow the generation of custom reports based on specified criteria, providing flexibility in data analysis.</li>
+</ul></li>
+<br/>
+
+<li><p><strong>Developer Resources</strong>:</p>
+
+<ul>
+<li><strong>Comprehensive Documentation</strong>: Detailed API documentation, including endpoint descriptions, request and response formats, error codes, and usage examples.</li>
+</ul></li>
+
+<br/>
+<li><p><strong>Compliance and Security</strong>:</p>
+
+<ul>
+<li><strong>Data Encryption</strong>: All data transmitted via the APIs is encrypted to ensure security and privacy.</li>
+<li><strong>Compliance</strong>: Niyam APIs adhere to industry standards and regulations, such as GDPR making them suitable for use in regulated industries like finance.</li>
+</ul></li>
+</ol>
+
+<h2 id='getting-started-with-niyam-apis'>Getting Started with Niyam APIs</h2>
+
+<p>APIs provided by Niyam classifications ensure that only authorized users can access sensitive functionalities, while still allowing open access to non-sensitive information or system statuses.</p>
+<h3 id='authenticated-apis'>Authenticated APIs</h3>
+<p>The Authenticated endpoints require users to provide valid credentials before access is granted. These endpoints are secured, ensuring that only authorized users can interact with sensitive data or perform privileged operations. Authentication typically involves the use of tokens, API keys, or OAuth, which must be included in the request header. These endpoints are designed for operations that involve personal data, secure transactions, or actions that could impact the system&#39;s state or other users.</p>
+
+<p>APIs that require trade permissions:</p>
+
+<table>
+<tr><td><code>/v1/order/place-order</code></td></tr>
+<tr><td><code>/v1/order/delete-order</code></td></tr>
+<tr><td><code>/v1/order/add-margin</code></td></tr>
+<tr><td><code>/v1/order/reduce-margin</code></td></tr>
+<tr><td><code>/v1/exchange/update/leverage</code></td></tr>
+<tr><td><code>/v1/order/cancel-all-orders</code></td></tr>
+<tr><td><code>/v1/positions/close-all-positions</code></td></tr>
+
+</table>
+<h3 id='public-apis'>Public APIs</h3>
+<p>The Public endpoints are accessible without any authentication, allowing open access to certain resources or information. These endpoints are designed to handle requests that do not require user identification or secure access, such as fetching general information, retrieving publicly available data, or providing status updates. While public, these endpoints are still subject to rate limiting and monitoring to prevent abuse or misuse of the system.</p>
+
+<p>Endpoints which <strong>DO NOT</strong> require <code>api-key</code> and <code>signature</code> authentication:</p>
+
+<table>
+<tr>
+<td><code>/v1/market/klines</code></td></tr>
+<tr><td><code>/v1/market/depth</code></td></tr>
+<tr><td><code>/v1/market/aggTrade</code></td></tr>
+<tr><td><code>/v1/market/ticker24Hr</code></td></tr>
+</table>
+
+<aside class="notice">
+Base URLs for: <br/>
+- Authenticated endpoints: <code>https://fapi.niyam.com/ </code> <br/>
+- Public endpoints: <code> https://api.niyam.com/ </code>
+</aside>
+
+<p>To begin using Niyam Authenticated APIs, follow these steps:</p>
+
+<ol>
+<li><p>API Key Creation <br/>
+Users can create an API key, which will be associated with a secret. The secret will be shown only once during the creation process.</p></li>
+<li><p>Signature Generation <br/></p>
+
+<ul>
+<li> For each authenticated request, users need to generate a signature using their secret key. <br/></li>
+<li>For GET requests: The data to be signed is the query string, which includes the timestamp and any other query parameters.<br/></li>
+<li>For POST/PUT/DELETE requests: The data to be signed is the body of the request, which includes the timestamp, and any other
+fields. <br/></li>
+<li>The signature is generated by applying HMAC-SHA256 to the data (query string or body) using the user&#39;s secret key. <br/></li>
+<li>The generated signature is sent in the request headers along with the API key. <br/></li>
+</ul></li>
+</ol>
+
+<h2 id="get-request">getRequest Function</h2>
+
+<p>The <code>getRequest</code> function sends a GET request to an API endpoint, handling both market and non-market endpoints differently. It adds a timestamp to the parameters for request uniqueness, generates a signature for authentication, and processes the response.</p>
+
+<p>Sends a GET request to the specified endpoint with the given parameters:</p>
+
+<ul>
+<li>endpoint (string): The API endpoint to which the request is sent. <br/></li>
+<li>params (Object, optional): Query parameters to include in the request. Defaults to an empty object.</li>
+</ul>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="cm">/**
+ * Sends a GET request to the specified endpoint with the given parameters.
+ *
+ * @param {string} endpoint - The API endpoint to send the request to.
+ * @param {Object} [params={}] - The query parameters to include in the request.
+ * @returns {Promise&lt;Object&gt;} - The response data from the API.
+ */</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">getRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{})</span> <span class="p">{</span>
+    <span class="c1">// Add a timestamp to the parameters for request uniqueness</span>
+    <span class="kd">const</span> <span class="nx">timestamp</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">();</span>
+    <span class="nx">params</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">=</span> <span class="nx">timestamp</span><span class="p">;</span>
+
+    <span class="c1">// Determine if the endpoint is a market endpoint</span>
+    <span class="kd">const</span> <span class="nx">isMarketEndpoint</span> <span class="o">=</span> <span class="nx">endpoint</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="dl">"</span><span class="s2">/v1/market</span><span class="dl">"</span><span class="p">);</span>
+    <span class="kd">let</span> <span class="nx">url</span> <span class="o">=</span> <span class="dl">""</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">queryString</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">URLSearchParams</span><span class="p">(</span><span class="nx">params</span><span class="p">).</span><span class="nx">toString</span><span class="p">();</span>
+
+    <span class="c1">// Construct the URL based on the endpoint type</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">isMarketEndpoint</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">publicBaseUrl</span><span class="p">}${</span><span class="nx">endpoint</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">baseUrl</span><span class="p">}${</span><span class="nx">endpoint</span><span class="p">}</span><span class="s2">?</span><span class="p">${</span><span class="nx">queryString</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Generate a signature for the request</span>
+    <span class="kd">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">crypto</span>
+      <span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="dl">"</span><span class="s2">sha256</span><span class="dl">"</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">queryString</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="dl">"</span><span class="s2">hex</span><span class="dl">"</span><span class="p">);</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="c1">// Send the GET request</span>
+        <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">axios</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span>
+            <span class="nx">url</span><span class="p">,</span>
+            <span class="o">!</span><span class="nx">isMarketEndpoint</span> <span class="p">?</span> <span class="p">{</span>
+                <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="dl">"</span><span class="s2">api-key</span><span class="dl">"</span><span class="p">:</span> <span class="nx">apiKey</span><span class="p">,</span>
+                    <span class="dl">"</span><span class="s2">signature</span><span class="dl">"</span><span class="p">:</span> <span class="nx">signature</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">}</span> <span class="p">:</span> <span class="p">{}</span>
+        <span class="p">);</span>
+        <span class="c1">// Log and return the response data</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Response:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Handle and log any errors that occur during the request</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span>
+            <span class="dl">"</span><span class="s2">Error:</span><span class="dl">"</span><span class="p">,</span>
+            <span class="nx">error</span><span class="p">.</span><span class="nx">response</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span> <span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id='response'>Response</h3>
+<p>Returns: A Promise that resolves to the response data from the API.</p>
+
+<p>Error Handling: If an error occurs during the request, it logs the error message or response data to the console.</p>
+
+<h2 id="post-request">postRequest Function</h2>
+
+<p>The function sends POST requests to an API endpoint, handling both authenticated and public requests based on the endpoint URL.</p>
+
+<ul>
+<li>endpoint (string): The API endpoint to which the POST request is sent.</li>
+<li>params (object): The parameters to be included in the POST request body. This is optional and defaults to an empty object.</li>
+</ul>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="c1">// Generic POST request function</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">postRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">timestamp</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">isMarketEndpoint</span> <span class="o">=</span> <span class="nx">endpoint</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="dl">"</span><span class="s2">/v1/market</span><span class="dl">"</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">baseUrlToUse</span> <span class="o">=</span> <span class="nx">isMarketEndpoint</span> <span class="p">?</span> <span class="nx">publicBaseUrl</span> <span class="p">:</span> <span class="nx">baseUrl</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">baseUrlToUse</span><span class="p">}${</span><span class="nx">endpoint</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isMarketEndpoint</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">params</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">=</span> <span class="nx">timestamp</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">crypto</span>
+    <span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="dl">"</span><span class="s2">sha256</span><span class="dl">"</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">params</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="dl">"</span><span class="s2">hex</span><span class="dl">"</span><span class="p">);</span>
+
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">axios</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span>
+      <span class="nx">url</span><span class="p">,</span>
+      <span class="nx">params</span><span class="p">,</span>
+      <span class="nx">isMarketEndpoint</span>
+        <span class="p">?</span> <span class="p">{}</span>
+        <span class="p">:</span> <span class="p">{</span>
+            <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+              <span class="dl">"</span><span class="s2">api-key</span><span class="dl">"</span><span class="p">:</span> <span class="nx">apiKey</span><span class="p">,</span>
+              <span class="na">signature</span><span class="p">:</span> <span class="nx">signature</span><span class="p">,</span>
+            <span class="p">},</span>
+          <span class="p">}</span>
+    <span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Response:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span>
+      <span class="dl">"</span><span class="s2">Error:</span><span class="dl">"</span><span class="p">,</span>
+      <span class="nx">error</span><span class="p">.</span><span class="nx">response</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span> <span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span>
+    <span class="p">);</span>
+    <span class="k">throw</span> <span class="nx">error</span><span class="p">;</span> <span class="c1">// Optional: re-throw the error if you want to handle it further up the call stack</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id='response-2'>Response</h3>
+<p><code>console.log(&quot;Response:&quot;, response.data);</code> <br/>
+Logs the response data to the console. <br/></p>
+
+<p><code>return response.data;</code> <br/>
+Returns the response data for further use.<br/></p>
+
+<h2 id="patch-request">patchRequest Function</h2>
+
+<p>The function sends PATCH requests to an API endpoint.</p>
+
+<ul>
+<li>endpoint (string): The API endpoint to which the PATCH request is sent.</li>
+<li>params (object): The parameters to be included in the PATCH request body. This is optional and defaults to an empty object.</li>
+</ul>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="c1">// Generic PATCH request function</span>
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">patchRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">timestamp</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">();</span>
+  <span class="kd">const</span> <span class="nx">isMarketEndpoint</span> <span class="o">=</span> <span class="nx">endpoint</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="dl">'</span><span class="s1">/v1/market</span><span class="dl">'</span><span class="p">);</span>
+  <span class="kd">const</span> <span class="nx">baseUrlToUse</span> <span class="o">=</span> <span class="nx">isMarketEndpoint</span> <span class="p">?</span> <span class="nx">publicBaseUrl</span> <span class="p">:</span> <span class="nx">baseUrl</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">baseUrlToUse</span><span class="p">}${</span><span class="nx">endpoint</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isMarketEndpoint</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">params</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">=</span> <span class="nx">timestamp</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">crypto</span>
+    <span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="dl">'</span><span class="s1">sha256</span><span class="dl">'</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">params</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="dl">'</span><span class="s1">hex</span><span class="dl">'</span><span class="p">);</span>
+
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">axios</span><span class="p">.</span><span class="nx">patch</span><span class="p">(</span>
+      <span class="nx">url</span><span class="p">,</span>
+      <span class="nx">params</span><span class="p">,</span>
+      <span class="nx">isMarketEndpoint</span>
+        <span class="p">?</span> <span class="p">{}</span>
+        <span class="p">:</span> <span class="p">{</span>
+            <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+              <span class="dl">'</span><span class="s1">api-key</span><span class="dl">'</span><span class="p">:</span> <span class="nx">apiKey</span><span class="p">,</span>
+              <span class="na">signature</span><span class="p">:</span> <span class="nx">signature</span><span class="p">,</span>
+            <span class="p">},</span>
+          <span class="p">},</span>
+    <span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Response:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span>
+      <span class="dl">'</span><span class="s1">Error:</span><span class="dl">'</span><span class="p">,</span>
+      <span class="nx">error</span><span class="p">.</span><span class="nx">response</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span> <span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span>
+    <span class="p">);</span>
+    <span class="k">throw</span> <span class="nx">error</span><span class="p">;</span> <span class="c1">// Optional: re-throw the error if you want to handle it further up the call stack</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id='response-3'>Response</h3>
+<p><code>console.log(&quot;Response:&quot;, response.data);</code> <br/>
+Logs the response data to the console. <br/></p>
+
+<p><code>return response.data;</code> <br/>
+Returns the response data for further use.<br/></p>
+
+<h2 id="put-request">putRequest Function</h2>
+
+<p>This function, <code>putRequest</code>, is an asynchronous JavaScript function designed to send a signed <code>PUT</code> HTTP request to a specified API endpoint. Here&#39;s a breakdown of its components and behavior:</p>
+
+<ul>
+<li>endpoint: A string representing the API endpoint to which the request will be sent. It is appended to a base URL to form the complete request URL.</li>
+<li>params: An optional object containing the parameters to be included in the request body. If no parameters are provided, an empty object is used by default.</li>
+</ul>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">const</span> <span class="nx">crypto</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">crypto</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">axios</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">axios</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">putRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{})</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">timestamp</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">();</span>
+  <span class="nx">params</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">=</span> <span class="nx">timestamp</span><span class="p">;</span>
+
+  <span class="kd">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">crypto</span>
+    <span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="dl">"</span><span class="s2">sha256</span><span class="dl">"</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">params</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="dl">"</span><span class="s2">hex</span><span class="dl">"</span><span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">baseUrl</span><span class="p">}${</span><span class="nx">endpoint</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">axios</span><span class="p">.</span><span class="nx">put</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="nx">params</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">api-key</span><span class="dl">"</span><span class="p">:</span> <span class="nx">apiKey</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">signature</span><span class="dl">"</span><span class="p">:</span> <span class="nx">signature</span><span class="p">,</span>
+      <span class="p">},</span>
+    <span class="p">});</span>
+
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Response:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span>
+      <span class="dl">"</span><span class="s2">Error:</span><span class="dl">"</span><span class="p">,</span>
+      <span class="nx">error</span><span class="p">.</span><span class="nx">response</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span> <span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div><h3 id='response-4'>Response</h3>
+<p>If the request is successful, the response data is logged to the console and returned by the function.</p>
+
+<h2 id="delete-request">deleteRequest Function</h2>
+
+<p>This deleteRequest function is an asynchronous JavaScript function designed to send a signed DELETE HTTP request to a specified API endpoint. Below is a detailed explanation of its components and behavior:</p>
+
+<ul>
+<li>endpoint: A string representing the API endpoint to which the DELETE request will be sent. It is appended to a base URL to form the complete request URL.</li>
+<li>params: An optional object containing the parameters to be included in the request. If no parameters are provided, an empty object is used by default.</li>
+</ul>
+<div class="highlight"><pre class="highlight javascript tab-javascript"><code><span class="kd">const</span> <span class="nx">crypto</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">crypto</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">axios</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">axios</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">deleteRequest</span><span class="p">(</span><span class="nx">endpoint</span><span class="p">,</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{})</span> <span class="p">{</span>
+  <span class="c1">// Generate a timestamp and add it to the params</span>
+  <span class="kd">const</span> <span class="nx">timestamp</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">().</span><span class="nx">toString</span><span class="p">();</span>
+  <span class="nx">params</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">=</span> <span class="nx">timestamp</span><span class="p">;</span>
+
+  <span class="c1">// Create a cryptographic signature using HMAC with SHA-256</span>
+  <span class="kd">const</span> <span class="nx">signature</span> <span class="o">=</span> <span class="nx">crypto</span>
+    <span class="p">.</span><span class="nx">createHmac</span><span class="p">(</span><span class="dl">"</span><span class="s2">sha256</span><span class="dl">"</span><span class="p">,</span> <span class="nx">apiSecret</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">update</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">params</span><span class="p">))</span>
+    <span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="dl">"</span><span class="s2">hex</span><span class="dl">"</span><span class="p">);</span>
+
+  <span class="c1">// Construct the full request URL</span>
+  <span class="kd">const</span> <span class="nx">url</span> <span class="o">=</span> <span class="s2">`</span><span class="p">${</span><span class="nx">baseUrl</span><span class="p">}${</span><span class="nx">endpoint</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+
+  <span class="k">try</span> <span class="p">{</span>
+    <span class="c1">// Send the DELETE request using axios</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">axios</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="p">{</span>
+      <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">api-key</span><span class="dl">"</span><span class="p">:</span> <span class="nx">apiKey</span><span class="p">,</span>
+        <span class="dl">"</span><span class="s2">signature</span><span class="dl">"</span><span class="p">:</span> <span class="nx">signature</span><span class="p">,</span>
+      <span class="p">},</span>
+      <span class="na">data</span><span class="p">:</span> <span class="nx">params</span><span class="p">,</span>
+    <span class="p">});</span>
+
+    <span class="c1">// Log and return the response data if the request is successful</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Response:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">response</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+
+  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Handle and log any errors that occur during the request</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span>
+      <span class="dl">"</span><span class="s2">Error:</span><span class="dl">"</span><span class="p">,</span>
+      <span class="nx">error</span><span class="p">.</span><span class="nx">response</span> <span class="p">?</span> <span class="nx">error</span><span class="p">.</span><span class="nx">response</span><span class="p">.</span><span class="nx">data</span> <span class="p">:</span> <span class="nx">error</span><span class="p">.</span><span class="nx">message</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>

@@ -1,0 +1,470 @@
+<h1 id='public-endpoints'>Public Endpoints</h1>
+
+<p>Public endpoints in Pi42 are designed to facilitate easy access to various functionalities of the Pi42 platform, particularly for integration with external systems and applications. 
+Below is an overview of the public endpoints available in Pi42, their typical uses, and example API calls.</p>
+
+<h2 id='exchange'>Exchange</h2>
+
+<p>Retrieve exchange information for a specific market, such as INR (Indian Rupee)</p>
+
+<h2 id='http-request'>HTTP Request</h2>
+
+<p><code>GET /v1/exchange/exchangeInfo</code> <br/>
+ Query param (optional):  <code>market</code></p>
+
+<p>Example: <code>GET /v1/exchange/exchangeInfo?market=INR</code></p>
+
+<h3 id='response'>Response</h3>
+
+<p>Here is the breakdown of the response fields and their meanings:</p>
+
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>market</td>
+<td>A list of markets included in the response. In this case, it is [&quot;INR&quot;].</td>
+</tr>
+<tr>
+<td>contracts</td>
+<td>An array of contract objects that contain detailed information about specific trading contracts available in the INR market.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>The name of the trading pair (e.g., &quot;BTCINR&quot; for Bitcoin to INR)</td>
+</tr>
+<tr>
+<td>contractName</td>
+<td>The full name of the contract (e.g., &quot;Bitcoin&quot;).</td>
+</tr>
+<tr>
+<td>filters</td>
+<td>A list of filters that apply to the contract, detailing quantity and order constraints</td>
+</tr>
+<tr>
+<td>maxQty</td>
+<td>The maximum quantity allowed</td>
+</tr>
+<tr>
+<td>minQty</td>
+<td>The minimum quantity allowed</td>
+</tr>
+<tr>
+<td>filterType</td>
+<td>The type of filter (e.g., &quot;MARKET_QTY_SIZE&quot;, &quot;LIMIT_QTY_SIZE&quot;, &quot;MAX_NUM_ORDERS&quot;, &quot;MIN_NOTIONAL&quot;).</td>
+</tr>
+<tr>
+<td>limit</td>
+<td>The maximum number of orders allowed.</td>
+</tr>
+<tr>
+<td>notional</td>
+<td>The minimum notional value.</td>
+</tr>
+<tr>
+<td>makerFee</td>
+<td>The fee percentage for makers.</td>
+</tr>
+<tr>
+<td>takerFee</td>
+<td>The fee percentage for takers.</td>
+</tr>
+<tr>
+<td>baseAsset</td>
+<td>The base asset for the contract (e.g., &quot;BTC&quot;).</td>
+</tr>
+<tr>
+<td>orderTypes</td>
+<td>The types of orders supported (e.g., &quot;LIMIT&quot;, &quot;MARKET&quot;).</td>
+</tr>
+<tr>
+<td>quoteAsset</td>
+<td>The quote asset for the contract (e.g., &quot;INR&quot;).</td>
+</tr>
+<tr>
+<td>maxLeverage</td>
+<td>The maximum leverage allowed (e.g., &quot;20&quot;).</td>
+</tr>
+<tr>
+<td>contractType</td>
+<td>The type of contract (e.g., &quot;PERPETUAL&quot;).</td>
+</tr>
+<tr>
+<td>marginBuffer</td>
+<td>The margin buffer value.</td>
+</tr>
+<tr>
+<td>depthGrouping</td>
+<td>The grouping for order book depth (e.g., [&quot;0.1&quot;]).</td>
+</tr>
+<tr>
+<td>liquidationFee</td>
+<td>The fee percentage for liquidation (e.g., &quot;0.020000&quot;).</td>
+</tr>
+<tr>
+<td>pricePrecision</td>
+<td>The number of decimal places for prices.</td>
+</tr>
+<tr>
+<td>isDefaultContract</td>
+<td>A boolean indicating if this is the default contract (e.g., true).</td>
+</tr>
+<tr>
+<td>quantityPrecision</td>
+<td>The number of decimal places for quantities.</td>
+</tr>
+<tr>
+<td>limitPriceVarAllowed</td>
+<td>The allowed price variation for limit orders (e.g., &quot;0.2&quot;).</td>
+</tr>
+<tr>
+<td>marginBufferPercentage</td>
+<td>The percentage for margin buffer (e.g., &quot;1&quot;).</td>
+</tr>
+<tr>
+<td>maintenanceMarginPercentage</td>
+<td>The percentage for maintenance margin (e.g., &quot;1&quot;).</td>
+</tr>
+<tr>
+<td>iconUrl</td>
+<td>The URL for the contract&#39;s icon (e.g., &quot;string&quot;).</td>
+</tr>
+<tr>
+<td>reduceMarginAllowedRatioPercent</td>
+<td>The allowed ratio percentage for reducing margin (e.g., 0.2).</td>
+</tr>
+<tr>
+<td>market</td>
+<td>The market identifier</td>
+</tr>
+<tr>
+<td>marginAssetsSupported</td>
+<td>A list of supported margin assets (e.g., [&quot;INR&quot;]).</td>
+</tr>
+<tr>
+<td>fundingFeeInterval</td>
+<td>The interval for funding fees (e.g., 8).</td>
+</tr>
+<tr>
+<td>tags</td>
+<td>A list of tags associated with the market or contracts (e.g., [&quot;MEME&quot;, &quot;DECENTRALIZED&quot;]).</td>
+</tr>
+<tr>
+<td>assetPrecisions</td>
+<td>An object that specifies the precision for assets.</td>
+</tr>
+<tr>
+<td>INR</td>
+<td>The precision for INR (e.g., 2 decimal places).</td>
+</tr>
+<tr>
+<td>conversionRates</td>
+<td>An object that specifies conversion rates for margin and settlement.</td>
+</tr>
+<tr>
+<td>INR_MARGIN_INR</td>
+<td>The conversion rate for INR margin to INR (e.g., 1).</td>
+</tr>
+<tr>
+<td>INR_SETTLEMENT_INR</td>
+<td>The conversion rate for INR settlement to INR (e.g., 1)</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>The above command returns JSON structured such as:</p>
+</blockquote>
+
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"markets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"INR"</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="nl">"contracts"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"contractName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bitcoin"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"filters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"maxQty"</span><span class="p">:</span><span class="w"> </span><span class="s2">"120"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"minQty"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.001"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"filterType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MARKET_QTY_SIZE"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"maxQty"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1000"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"minQty"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.001"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"filterType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LIMIT_QTY_SIZE"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"limit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"200"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"filterType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MAX_NUM_ORDERS"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"notional"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8780"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"filterType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MIN_NOTIONAL"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"makerFee"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.005</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"takerFee"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"baseAsset"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTC"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"orderTypes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"LIMIT"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"MARKET"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"quoteAsset"</span><span class="p">:</span><span class="w"> </span><span class="s2">"INR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"maxLeverage"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"contractType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PERPETUAL"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"marginBuffer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.01"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"depthGrouping"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"0.1"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"liquidationFee"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.020000"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"pricePrecision"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"isDefaultContract"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"quantityPrecision"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"limitPriceVarAllowed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.2"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"marginBufferPercentage"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"maintenanceMarginPercentage"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"iconUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"reduceMarginAllowedRatioPercent"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"market"</span><span class="p">:</span><span class="w"> </span><span class="s2">"INR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"marginAssetsSupported"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"INR"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"fundingFeeInterval"</span><span class="p">:</span><span class="w"> </span><span class="mi">8</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="nl">"tags"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"MEME"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"DECENTRALIZED"</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="nl">"assetPrecisions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"INR"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"conversionRates"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"INR_MARGIN_INR"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"INR_SETTLEMENT_INR"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='market'>Market</h2><h3 id='klines'>Klines</h3>
+<p>Fetch the candlestick data for a contract pair.</p>
+
+<p><code>POST /v1/market/klines</code></p>
+
+<p>Available interval values: <code>1m</code>, <code>3m</code>, <code>5m</code>, <code>15m</code>, <code>30m</code>, <code>1h</code>, <code>2h</code>, <code>4h</code>, <code>6h</code>, <code>8h</code>, <code>12h</code>, <code>1d</code>, <code>3d</code>, <code>1w</code>, <code>1M</code></p>
+
+<p><strong>m: Minute, h: Hour, d: Day, w: Week, M: Month</strong></p>
+<h3 id='request'>Request</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>pair</code></td>
+<td>This specifies the trading pair, in this case, Bitcoin to Indian Rupee (INR).</td>
+</tr>
+<tr>
+<td><code>interval</code></td>
+<td>This sets the time interval for the data; 1m means 1 minute.</td>
+</tr>
+<tr>
+<td><code>startTime</code></td>
+<td>1696425435000: The start time for the data in EPOCH timestamp (milliseconds).</td>
+</tr>
+<tr>
+<td><code>endTime</code></td>
+<td>1696425435999: The end time for the data in EPOCH timestamp (milliseconds).</td>
+</tr>
+<tr>
+<td><code>limit</code></td>
+<td>This sets the maximum number of data points to retrieve.<br/> The default limit is 500, and the maximum is 1500.</td>
+</tr>
+</tbody></table>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"pair"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Contract</span><span class="w"> </span><span class="err">Pair</span><span class="w">
+    </span><span class="nl">"interval"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1m"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">'</span><span class="mi">1</span><span class="err">'</span><span class="w"> </span><span class="err">OR</span><span class="w"> </span><span class="err">'</span><span class="mi">5</span><span class="err">'</span><span class="w"> </span><span class="err">OR</span><span class="w"> </span><span class="err">'</span><span class="mi">60</span><span class="err">'</span><span class="w"> </span><span class="err">OR</span><span class="w"> </span><span class="err">'</span><span class="mi">1</span><span class="err">D'</span><span class="w"> </span><span class="err">for</span><span class="w"> </span><span class="mi">1</span><span class="err">min</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="err">min</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="err">hour</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="err">day</span><span class="w"> </span><span class="err">respectively</span><span class="w">
+    </span><span class="nl">"startTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">1696425435000</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">EPOCH</span><span class="w"> </span><span class="err">timestamp</span><span class="w"> </span><span class="err">in</span><span class="w"> </span><span class="err">milliseconds</span><span class="w">
+    </span><span class="nl">"endTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">1696425435999</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">EPOCH</span><span class="w"> </span><span class="err">timestamp</span><span class="w"> </span><span class="err">in</span><span class="w"> </span><span class="err">milliseconds</span><span class="w">
+    </span><span class="nl">"limit"</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Max</span><span class="w"> </span><span class="err">limit</span><span class="w"> </span><span class="err">is</span><span class="w"> </span><span class="mi">1500</span><span class="w"> </span><span class="err">and</span><span class="w"> </span><span class="err">default</span><span class="w"> </span><span class="err">limit</span><span class="w"> </span><span class="err">is</span><span class="w"> </span><span class="mi">500</span><span class="w"> </span><span class="err">if</span><span class="w"> </span><span class="err">no</span><span class="w"> </span><span class="err">limit</span><span class="w"> </span><span class="err">value</span><span class="w"> </span><span class="err">will</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="err">passed</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h3 id='response-2'>Response</h3>
+<blockquote>
+<p>The above command returns JSON structured like this:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="w">  </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"startTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">1706527190</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"open"</span><span class="p">:</span><span class="w"> </span><span class="mi">3568200</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"high"</span><span class="p">:</span><span class="w"> </span><span class="mi">3600000</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"low"</span><span class="p">:</span><span class="w"> </span><span class="mi">3450000</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"close"</span><span class="p">:</span><span class="w"> </span><span class="mi">3543212</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"endTime"</span><span class="p">:</span><span class="w"> </span><span class="mi">1706527090</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"volume"</span><span class="p">:</span><span class="w"> </span><span class="mi">10000</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+
+<aside class="notice">
+ The data values will be in descending order of endTime  
+</aside>
+<div class="highlight"><pre class="highlight python tab-python"><code>
+
+</code></pre></div><div class="highlight"><pre class="highlight javascript tab-javascript"><code>
+
+</code></pre></div>
+<h2 id='depth-update'>Depth Update</h2>
+
+<p>Fetch the depth update data for a contract pair.</p>
+
+<p><code>GET /v1/market/depth/:contractPair</code></p>
+
+<h3 id='path-params'>Path Params:</h3>
+
+<p><code>contractPair</code>: string // <strong>contract Pair for which data is required (ex - &quot;btcinr&quot;, &quot;ethinr&quot;)</strong></p>
+
+<h3 id='response-3'>Response</h3>
+
+<p>The data response structure will be same as the socket event data . The data can be null as well.</p>
+
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"depthUpdate"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Event</span><span class="w"> </span><span class="err">type</span><span class="w">
+  </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1707636353921</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Event</span><span class="w"> </span><span class="err">time</span><span class="w">
+  </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1707636353915</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Transaction</span><span class="w"> </span><span class="err">time</span><span class="w">
+  </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Symbol</span><span class="w">
+  </span><span class="nl">"U"</span><span class="p">:</span><span class="w"> </span><span class="mi">3960811287130</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Final</span><span class="w"> </span><span class="err">update</span><span class="w"> </span><span class="err">ID</span><span class="w"> </span><span class="err">in</span><span class="w"> </span><span class="err">event</span><span class="w">
+  </span><span class="nl">"u"</span><span class="p">:</span><span class="w"> </span><span class="mi">3960811297623</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">First</span><span class="w"> </span><span class="err">update</span><span class="w"> </span><span class="err">ID</span><span class="w"> </span><span class="err">in</span><span class="w"> </span><span class="err">event</span><span class="w">
+  </span><span class="nl">"pu"</span><span class="p">:</span><span class="w"> </span><span class="mi">3960811281312</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Previous</span><span class="w"> </span><span class="err">final</span><span class="w"> </span><span class="err">update</span><span class="w"> </span><span class="err">ID</span><span class="w">
+  </span><span class="nl">"b"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Bids</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="err">updated</span><span class="w">
+    </span><span class="p">[</span><span class="w"> 
+      </span><span class="s2">"4240107.8"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Price</span><span class="w"> </span><span class="err">Value</span><span class="w">
+      </span><span class="s2">"0.710"</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Quantity</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="w"> 
+      </span><span class="s2">"4240116.5"</span><span class="p">,</span><span class="w"> 
+      </span><span class="s2">"0.230"</span><span class="w"> 
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Asks</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="err">updated</span><span class="w">
+    </span><span class="p">[</span><span class="w"> 
+      </span><span class="s2">"4240353.6"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Price</span><span class="w"> </span><span class="err">Value</span><span class="w">
+      </span><span class="s2">"17.892"</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Quantity</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="p">[</span><span class="w"> 
+      </span><span class="s2">"4240362.4"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"1.206"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='agg-trade-update'>Agg Trade Update</h2>
+<p>Fetch the trade update data for a contract pair.</p>
+
+<p><code>GET /v1/market/aggTrade/:contractPair</code></p>
+<h3 id='path-parameters'>Path parameters</h3>
+<p><code>contractPair</code>: string //contract Pair for which data is required (ex - btcinr, ethinr)</p>
+<h3 id='response-4'>Response</h3>
+<p>The data will contain the latest list of trade events sorted in ascending order of trade time. The maximum length of the list is 50. The data can be null or can contain less than 50 entries.</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aggTrade"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Event</span><span class="w"> </span><span class="err">type</span><span class="w">
+  </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1707634200153</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Event</span><span class="w"> </span><span class="err">time</span><span class="w">
+  </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="mi">166326960</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Aggregate</span><span class="w"> </span><span class="err">trade</span><span class="w"> </span><span class="err">ID</span><span class="w">
+  </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Symbol</span><span class="w">
+  </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4264989.9"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Price</span><span class="w">
+  </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5.029"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Quantity</span><span class="w">
+  </span><span class="nl">"f"</span><span class="p">:</span><span class="w"> </span><span class="mi">279997733</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">First</span><span class="w"> </span><span class="err">trade</span><span class="w"> </span><span class="err">ID</span><span class="w">
+  </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="mi">279997733</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Last</span><span class="w"> </span><span class="err">trade</span><span class="w"> </span><span class="err">ID</span><span class="w">
+  </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1707634199985</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Trade</span><span class="w"> </span><span class="err">time</span><span class="w">
+  </span><span class="nl">"m"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Is</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">buyer</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">market</span><span class="w"> </span><span class="err">maker?</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+
+<blockquote>
+<p>Here is a sample response </p>
+</blockquote>
+
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aggTrade"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452822</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="mi">2199101094</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6058696.14"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.029"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"f"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971528</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971528</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452757</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"m"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aggTrade"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452856</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="mi">2199101095</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6058696.14"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.058"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"f"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971529</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971559</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452820</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"m"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aggTrade"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452856</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="mi">2199101096</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6058722.6"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.025"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"f"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971560</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971560</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452854</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"m"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aggTrade"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452856</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"a"</span><span class="p">:</span><span class="w"> </span><span class="mi">2199101097</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6058722.6"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.002"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"f"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971561</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="mi">5054971561</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"T"</span><span class="p">:</span><span class="w"> </span><span class="mi">1717160452854</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"m"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aggTrade"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">171716045</span><span class="w">
+
+</span></code></pre></div><h2 id='ticker-update-24hr'>Ticker Update (24Hr)</h2>
+<p>Fetch the 24 hr ticker update data for a contract pair.</p>
+
+<p><code>GET /v1/market/ticker24Hr/:contractPair</code></p>
+<h3 id='path-parameters-2'>Path Parameters</h3>
+<p><code>contractPair</code>: string //contract Pair for which data is required (example - &quot;btcinr&quot;, &quot;ethinr&quot;)</p>
+<h3 id='response-5'>Response</h3>
+<p>The data response structure will be same as the socket event data . The data can be null as well.</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"e"</span><span class="p">:</span><span class="w"> </span><span class="s2">"24hrTicker"</span><span class="p">,</span><span class="w">    </span><span class="err">//</span><span class="w"> </span><span class="err">Event</span><span class="w"> </span><span class="err">type</span><span class="w">
+    </span><span class="nl">"E"</span><span class="p">:</span><span class="w"> </span><span class="mi">1707635719309</span><span class="p">,</span><span class="w">   </span><span class="err">//</span><span class="w"> </span><span class="err">Event</span><span class="w"> </span><span class="err">time</span><span class="w">
+    </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BTCINR"</span><span class="p">,</span><span class="w">      </span><span class="err">//</span><span class="w"> </span><span class="err">Symbol</span><span class="w">
+    </span><span class="nl">"p"</span><span class="p">:</span><span class="w"> </span><span class="s2">"87845.124"</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Price</span><span class="w"> </span><span class="err">change</span><span class="w">
+    </span><span class="nl">"P"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.116"</span><span class="p">,</span><span class="w">      </span><span class="err">//</span><span class="w"> </span><span class="err">Price</span><span class="w"> </span><span class="err">change</span><span class="w"> </span><span class="err">percent</span><span class="w">
+    </span><span class="nl">"w"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4188295.5225"</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Weighted</span><span class="w"> </span><span class="err">average</span><span class="w"> </span><span class="err">price</span><span class="w">
+    </span><span class="nl">"c"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4239633.639"</span><span class="p">,</span><span class="w">   </span><span class="err">//</span><span class="w"> </span><span class="err">Last</span><span class="w"> </span><span class="err">price</span><span class="w">
+    </span><span class="nl">"Q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.003"</span><span class="p">,</span><span class="w">      </span><span class="err">//</span><span class="w"> </span><span class="err">Last</span><span class="w"> </span><span class="err">quantity</span><span class="w">
+    </span><span class="nl">"o"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4151788.515"</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Open</span><span class="w"> </span><span class="err">price</span><span class="w">
+    </span><span class="nl">"h"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4267566"</span><span class="p">,</span><span class="w">   </span><span class="err">//</span><span class="w"> </span><span class="err">High</span><span class="w"> </span><span class="err">price</span><span class="w">
+    </span><span class="nl">"l"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4112704.2840000005"</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Low</span><span class="w"> </span><span class="err">price</span><span class="w">
+    </span><span class="nl">"v"</span><span class="p">:</span><span class="w"> </span><span class="s2">"222797.117"</span><span class="p">,</span><span class="w">    </span><span class="err">//</span><span class="w"> </span><span class="err">Total</span><span class="w"> </span><span class="err">traded</span><span class="w"> </span><span class="err">base</span><span class="w"> </span><span class="err">asset</span><span class="w"> </span><span class="err">volume</span><span class="w">
+    </span><span class="nl">"q"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10626810856.19"</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Total</span><span class="w"> </span><span class="err">traded</span><span class="w"> </span><span class="err">quote</span><span class="w"> </span><span class="err">asset</span><span class="w"> </span><span class="err">volume</span><span class="w">
+    </span><span class="nl">"O"</span><span class="p">:</span><span class="w"> </span><span class="mi">1707549300000</span><span class="p">,</span><span class="w">   </span><span class="err">//</span><span class="w"> </span><span class="err">Statistics</span><span class="w"> </span><span class="err">open</span><span class="w"> </span><span class="err">time</span><span class="w">
+    </span><span class="nl">"C"</span><span class="p">:</span><span class="w"> </span><span class="mi">1707635719307</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Statistics</span><span class="w"> </span><span class="err">close</span><span class="w"> </span><span class="err">time</span><span class="w">
+    </span><span class="nl">"F"</span><span class="p">:</span><span class="w"> </span><span class="mi">4575372791</span><span class="p">,</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">First</span><span class="w"> </span><span class="err">trade</span><span class="w"> </span><span class="err">ID</span><span class="w">
+    </span><span class="nl">"L"</span><span class="p">:</span><span class="w"> </span><span class="mi">4578191477</span><span class="p">,</span><span class="w"> </span><span class="err">//</span><span class="w"> </span><span class="err">Last</span><span class="w"> </span><span class="err">trade</span><span class="w"> </span><span class="err">ID</span><span class="w">
+    </span><span class="nl">"n"</span><span class="p">:</span><span class="w"> </span><span class="mi">2818668</span><span class="w">  </span><span class="err">//</span><span class="w"> </span><span class="err">Total</span><span class="w"> </span><span class="err">number</span><span class="w"> </span><span class="err">of</span><span class="w"> </span><span class="err">trades</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
