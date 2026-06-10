@@ -27,6 +27,13 @@ Options:
 #Run command : docker run --rm --name slate -p 4567:4567 -v $(pwd)/source:/srv/slate/source slatedocs/slate serve
 #Build command: docker run --rm --name slate -v $(pwd)/build:/srv/slate/build -v $(pwd)/source:/srv/slate/source slatedocs/slate build
 
+
+run_build() {
+  /Applications/Docker.app/Contents/Resources/bin/docker run --rm \
+    -v $(pwd):/srv/slate \
+    slatedocs/slate build
+}
+
 parse_args() {
   # Set args from a local environment file.
   if [ -e ".env" ]; then
@@ -220,11 +227,10 @@ sanitize() {
 parse_args "$@"
 
 if [[ ${source_only} ]]; then
-  # run_build
-  continue
+  run_build
 elif [[ ${push_only} ]]; then
   main "$@"
 else
-  # run_build
+  run_build
   main "$@"
 fi

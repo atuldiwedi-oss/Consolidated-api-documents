@@ -1,0 +1,10 @@
+diff --git a/source/pi42-api/authentication/index.md.erb b/source/shark-api/authentication/index.md.erb
+index fbc7a0c..d50a861 100644
+--- a/source/pi42-api/authentication/index.md.erb
++++ b/source/shark-api/authentication/index.md.erb
+@@ -1,4 +1,4 @@
+-<h1 id='authentication'>Authentication</h1>
++<h2 id='authentication'>Authentication</h2>
+ 
+ 1. API Key Creation <br/>
+     Users can create an API key, which will be associated with a secret. The secret will be shown only once during the creation process.

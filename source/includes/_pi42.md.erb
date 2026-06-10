@@ -1,15 +1,17 @@
-# PI42 APIs
-
 <%= partial  "./pi42-api/changelog/index.md.erb" %>
 
-<%= partial  "./pi42-api/introduction/index.md.erb" %>
+<%= partial "./shared/introduction/index.md.erb",
+    locals: { product_name: "Pi42" } %>
 
-<%= partial  "./pi42-api/rate-limits.md.erb" %>
+<%= partial "./shared/authentication/index.md.erb" %>
 
-<%= partial  "./pi42-api/orders/index.md.erb" %>
+<%= partial "./shared/rate-limits.md.erb" %>
 
-<%= partial  "./pi42-api/public-endpoints/index.md.erb" %>
+<%= partial "./shared/orders/index.md.erb" %>
+
+<%= partial "./shared/public-endpoints/index.md.erb" %>
 
 <%= partial  "./pi42-api/websockets/index.md.erb" %>
 
-<%= partial  "./pi42-api/errors.md.erb" %>
+<%= partial "./shared/errors.md.erb",
+    locals: { product_name: "Pi42" } %>

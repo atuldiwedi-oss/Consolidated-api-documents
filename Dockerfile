@@ -12,8 +12,8 @@ RUN apt-get update \
         build-essential \
         git \
         nodejs \
-    && gem install bundler \
-    && bundle install \
+    && gem install bundler -v 2.2.22 \
+    && bundle _2.2.22_ install \
     && apt-get remove -y build-essential git \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*

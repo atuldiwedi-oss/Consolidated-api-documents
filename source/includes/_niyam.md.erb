@@ -1,10 +1,11 @@
-# Niyam APIs
-
 <%= partial  "./niyam-api/changelog/index.md.erb" %>
 
-<%= partial  "./niyam-api/introduction/index.md.erb" %>
+<%= partial "./shared/introduction/index.md.erb",
+    locals: { product_name: "Niyam" } %>
 
-<%= partial  "./niyam-api/rate-limits.md.erb" %>
+<%= partial "./shared/authentication/index.md.erb" %>
+
+<%= partial "./shared/rate-limits.md.erb" %>
 
 <%= partial  "./niyam-api/orders/index.md.erb" %>
 
@@ -12,4 +13,5 @@
 
 <%= partial  "./niyam-api/websockets/index.md.erb" %>
 
-<%= partial  "./niyam-api/errors.md.erb" %>
+<%= partial "./shared/errors.md.erb",
+    locals: { product_name: "Niyam" } %>

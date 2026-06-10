@@ -64,8 +64,7 @@ under the License.
     <% end %>
   </head>
 
-  <body class="<%= page_classes %>" data-languages="<%=h language_tabs.map{ |lang| lang.is_a?(Hash) ? lang.keys.first : lang }.to_json %>">
-    <a href="#" id="nav-button">
+<body class="<%= page_classes %> <%= current_page.data.brand %>" data-languages="<%=h language_tabs.map{ |lang| lang.is_a?(Hash) ? lang.keys.first : lang }.to_json %>">    <a href="#" id="nav-button">
       <span>
         NAV
         <%= image_tag('navbar.png') %>
@@ -73,7 +72,7 @@ under the License.
     </a>
     <div class="toc-wrapper">
       <div class="logo-parent">
-      <%= image_tag "logo.png", class: 'logo' %>
+      <%= image_tag "#{current_page.data.brand}-logo.png", class: 'logo' %>
       </div>
       <% if language_tabs.any? %>
         <div class="lang-selector">

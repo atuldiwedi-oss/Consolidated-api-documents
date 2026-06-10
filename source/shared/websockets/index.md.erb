@@ -5,7 +5,7 @@ WebSockets are used to provide real-time updates and maintain a continuous conne
 Here's how different web sockets work:
 
 
-<h3 id="authenticated-web-sockets">Authenticated Web Sockets</h3>
+<h2 id="authenticated-web-sockets">Authenticated Web Sockets</h2>
 
 Authenticated WebSockets require user validation to ensure that only authorized users can access the data or functionality provided such as receiving real-time updates about a trader's account.
 
@@ -13,7 +13,7 @@ For example,  balance changes, order executions, or margin updates.
 
 <aside class="notice"> Notes:
 <ul>
-  <li>Authenticated Web Socket stream base URL <code>https://fawss-uds.cryptxindia.com/auth-stream </code></li>
+  <li>Authenticated Web Socket stream base URL <code><%= brand_config[:auth_api] %>/auth-stream </code></li>
   <li>Requires listenkey that can be obtained from the <a href="#create-listen-key">Create Listen Key API</a></li>
 </ul>
 </aside>
@@ -91,7 +91,7 @@ Event listeners are described below:
 
 
 ```javascript
-const serverUrl = `https://fawss-uds.cryptxindia.com/auth-stream/${listenKey}`;
+const serverUrl = `<%= brand_config[:auth_api] %>/auth-stream/${listenKey}`;
 
 // Create a new socket connection
 const socket = io(serverUrl);
@@ -172,7 +172,7 @@ import socketio
 import asyncio
 
 # WebSocket server URL (without namespace)
-server_url = 'Cryptx-Authenticated-websocket-url'
+server_url = <%= brand_config[:product_name] %>-Authenticated-websocket-url
 
 # Namespace path for authorized streaming
 namespace_path = '/auth-stream/your-listen-key'
@@ -273,7 +273,7 @@ For example, to receive real-time updates on market data such as price changes, 
 
 <aside class="notice">
 
-  Public Web Socket URL <code>https://fawss.cryptxindia.com/</code>
+  Public Web Socket URL <code><%= brand_config[:public_api] %>/</code>
 
 </aside>
 
@@ -356,7 +356,7 @@ Once connected, users can subscribe to different topics mentioned below:
 import { io } from 'socket.io-client';
 
 // WebSocket server URL
-const serverUrl = 'https://fawss.cryptxindia.com/';
+const serverUrl = '<%= brand_config[:public_api] %>/';
 
 // Create a new socket connection
 const socket = io(serverUrl);
@@ -432,7 +432,7 @@ function subscribeToTopics() {
 import socketio
 
 # WebSocket server URL
-server_url = 'https://fawss.cryptxindia.com/'
+server_url = '<%= brand_config[:public_api] %>/'
 
 # Create a new Socket.IO client
 sio = socketio.Client()
@@ -521,7 +521,7 @@ A listen key is used to maintain a persistent connection to the WebSocket server
 
 
 ```javascript
-const baseUrl = process.env.CRYPTX_BASE_URL + '/v1/retail/listen-key';
+const baseUrl = process.env.PI42_BASE_URL + '/v1/retail/listen-key';
 
 // Function to generate a signature for the request
 const generateSignature = (params: object, apiSecret: string) => {
